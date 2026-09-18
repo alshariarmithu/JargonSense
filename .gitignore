@@ -12,8 +12,7 @@ glove*.txt
 *.kv
 *.kv.vectors.npy
 
-
+data/raw/
 data/raw/druglib/
 data/raw/senti4sd/
-
 data/interim/
