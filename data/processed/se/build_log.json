@@ -1,0 +1,20 @@
+{
+  "rows_loaded": 4423,
+  "fleiss_kappa": 0.7586,
+  "fleiss_kappa_items": 4359,
+  "dropped_empty_text": 0,
+  "dropped_bad_label": 0,
+  "dropped_duplicate_text": 92,
+  "rows_final": 4331,
+  "class_counts": {
+    "negative": 1176,
+    "neutral": 1662,
+    "positive": 1493
+  },
+  "class_proportions": {
+    "negative": 0.2715,
+    "neutral": 0.3837,
+    "positive": 0.3447
+  },
+  "mean_words": 29.97
+}

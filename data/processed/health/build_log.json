@@ -1,0 +1,45 @@
+{
+  "neutral_min_words": 15,
+  "rows_loaded": 4143,
+  "bias_probe_rows": 4143,
+  "dropped_missing_text": 13,
+  "dropped_boilerplate": 25,
+  "dropped_drug_monograph": 24,
+  "dropped_under_15_words": 776,
+  "dropped_duplicate_text": 60,
+  "rows_after_filtering": 3262,
+  "rows_after_filtering_no_length_rule": 4021,
+  "band_counts": {
+    "positive": 1824,
+    "discard": 847,
+    "negative": 591
+  },
+  "neutral_candidates_written": 1200,
+  "neutral_candidates_available": 1343,
+  "neutral_candidates_available_at_8_words": 1543,
+  "neutral_labelled_rows": 0,
+  "target_proportions_source": "data/processed/se/build_log.json",
+  "target_proportions": {
+    "negative": 0.2715,
+    "neutral": 0.3837,
+    "positive": 0.3447
+  },
+  "available_per_class": {
+    "negative": 591,
+    "neutral": 0,
+    "positive": 1824
+  },
+  "binding_class": "negative",
+  "neutral_rows_needed_for_target": 835,
+  "sampled_per_class": {
+    "negative": 591,
+    "neutral": 0,
+    "positive": 750
+  },
+  "rows_final": 1341,
+  "mean_words": 64.4,
+  "mean_words_per_class": {
+    "negative": 69.68,
+    "positive": 60.23
+  }
+}
