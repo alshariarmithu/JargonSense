@@ -78,6 +78,22 @@ def create_splits(domain: str) -> None:
     print(f"[{domain.upper()}]   Val:   {len(val_df)} rows ({len(val_df)/len(df):.1%})")
     print(f"[{domain.upper()}]   Test:  {len(test_df)} rows ({len(test_df)/len(df):.1%})")
 
+def load_splits(domain: str) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Loads the frozen train, val, and test splits for the given domain."""
+    if domain not in DOMAINS:
+        raise ValueError(f"Domain must be one of {DOMAINS}")
+    
+    data_dir = ROOT / f"data/processed/{domain}"
+    
+    if not (data_dir / "train.csv").exists():
+        raise FileNotFoundError(f"Splits not found for {domain}. Run create_splits first.")
+        
+    train_df = pd.read_csv(data_dir / "train.csv", sep=";")
+    val_df = pd.read_csv(data_dir / "val.csv", sep=";")
+    test_df = pd.read_csv(data_dir / "test.csv", sep=";")
+    
+    return train_df, val_df, test_df
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--domain", required=True, choices=DOMAINS, help="Domain to split")
