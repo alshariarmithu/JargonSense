@@ -39,7 +39,7 @@ FEATURES = RESULTS / "features"
 EXPLANATIONS = RESULTS / "explanations"
 
 MODELS = ROOT / "models"
-REPORT = ROOT / "report"
+REPORT = ROOT / "docs" / "report"
 
 
 def processed_dir(domain: str) -> Path:

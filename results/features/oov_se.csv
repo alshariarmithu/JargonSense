@@ -1,3 +1,0 @@
-embedding,vocabulary_size,oov_token_rate,documents_with_no_known_tokens,placeholders_known
-glove,400000,0.0244,9,(none)
-w2v,3752,0.0388,0,"CODE, URL, USER, EMO_POS, EMO_NEG"

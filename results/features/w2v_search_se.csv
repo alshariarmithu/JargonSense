@@ -1,5 +1,0 @@
-vector_size,sg,algorithm,vocabulary_size,val_macro_f1
-50,0,CBOW,3752,0.6751
-50,1,skip-gram,3752,0.6825
-100,0,CBOW,3752,0.7043
-100,1,skip-gram,3752,0.7042

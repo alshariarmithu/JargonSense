@@ -1,16 +1,2 @@
 model,representation,classifier,kind,accuracy,macro_f1,neutral_to_negative,negative_recall
-tfidf13_svm,TF-IDF,svm,discriminative,0.8308,0.8275,0.144,0.7614
-tfidf13_lr,TF-IDF,lr,discriminative,0.8262,0.8233,0.148,0.767
-tfidf12_lr,TF-IDF,lr,discriminative,0.8138,0.8108,0.14,0.75
-tfidf12_svm,TF-IDF,svm,discriminative,0.8154,0.8103,0.128,0.6932
-tfidf11_svm,TF-IDF,svm,discriminative,0.8123,0.8081,0.12,0.7102
-tfidf11_lr,TF-IDF,lr,discriminative,0.8092,0.807,0.136,0.75
-tfidf12_mnb,TF-IDF,mnb,generative,0.7662,0.7601,0.12,0.625
-tfidf13_mnb,TF-IDF,mnb,generative,0.76,0.7546,0.132,0.6193
-tfidf11_mnb,TF-IDF,mnb,generative,0.74,0.7331,0.084,0.5625
-w2v_svm,Word2Vec,svm,discriminative,0.7138,0.7059,0.116,0.5511
-glove_lr,GloVe,lr,discriminative,0.7077,0.7054,0.172,0.6307
-w2v_lr,Word2Vec,lr,discriminative,0.7046,0.702,0.204,0.6477
-glove_svm,GloVe,svm,discriminative,0.7015,0.6936,0.124,0.5284
-w2v_gnb,Word2Vec,gnb,generative,0.5769,0.5813,0.496,0.892
-glove_gnb,GloVe,gnb,generative,0.5677,0.5668,0.392,0.7955
+tfidf13_svm,"TF-IDF (1,3)",calibrated Linear SVM,discriminative,0.8308,0.8275,0.144,0.7614

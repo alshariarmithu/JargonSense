@@ -6,7 +6,7 @@ from ``describe_rules()``, so the report cannot drift away from the code.
 
     python -m tools.make_examples
 
-Output: report/preprocess_examples.md
+Output: docs/report/preprocess_examples.md
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ import pandas as pd
 from src.extraction.clean_text import DOMAINS, PLACEHOLDERS, SEED, describe_rules, clean
 
 from src.paths import ROOT
-OUT = ROOT / "report/preprocess_examples.md"
+OUT = ROOT / "docs/report/preprocess_examples.md"
 
 N_EXAMPLES = 10
 N_WITH_PLACEHOLDER = 6  # of the ten, how many must exercise a domain rule

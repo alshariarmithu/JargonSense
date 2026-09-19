@@ -1,258 +1,64 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SE Sentiment Audit</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SE Sentiment Classifier</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="top">
   <div class="top-inner">
     <div class="brand">
       <div class="brand-mark">SE</div>
       <div class="brand-text">
-        <h1>Sentiment Audit</h1>
-        <p>CSE 4122 &middot; Senti4SD &middot; 15 models</p>
+        <h1>SE Sentiment Classifier</h1>
+        <p>TF-IDF (1,3) + calibrated Linear SVM</p>
       </div>
     </div>
-
-    <nav class="tabs" role="tablist">
-      <button class="tab" role="tab" data-view="predict"  aria-selected="true">Predict</button>
-      <button class="tab" role="tab" data-view="compare"  aria-selected="false">Compare</button>
-      <button class="tab" role="tab" data-view="results"  aria-selected="false">Results</button>
-      <button class="tab" role="tab" data-view="stress"   aria-selected="false">Stress test</button>
-      <button class="tab" role="tab" data-view="findings" aria-selected="false">Findings</button>
-    </nav>
-
-    <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round"><path id="theme-icon"
-           d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
-    </button>
   </div>
 </header>
 
 <main class="shell">
-
-  <!-- ============================================================ PREDICT -->
-  <section class="view active" id="view-predict">
+  <section class="view active">
     <div class="card">
       <div class="card-head">
-        <h2>Classify a sentence</h2>
-        <span class="badge" id="predict-method">exact</span>
+        <h2>Classify developer communication</h2>
+        <span class="badge slow">LIME</span>
       </div>
-      <p class="hint">
-        Type anything a developer might write. The model returns a label, its
-        confidence, and the words that drove the decision.
-      </p>
-
-      <textarea id="predict-text"
-        placeholder="Kill the process before restarting the server.">Kill the process before restarting the server.</textarea>
-
+      <textarea id="predict-text">Kill the process before restarting the server.</textarea>
       <div class="row" style="margin-top:12px">
-        <select id="predict-model" class="grow" aria-label="Model"></select>
         <button class="btn" id="predict-go">Classify</button>
       </div>
-
       <div class="chipset" id="examples" style="margin-top:12px"></div>
     </div>
 
     <div class="card" id="predict-out" hidden>
       <div class="card-head">
-        <h2>Result</h2>
-        <span class="verdict" id="predict-verdict">neutral</span>
+        <h2>Prediction</h2>
+        <span class="verdict" id="predict-verdict"></span>
       </div>
-
       <div class="grid-2">
         <div>
-          <h3 style="margin-bottom:8px">Words that drove it</h3>
+          <h3>Token contributions</h3>
           <div class="sentence" id="predict-sentence"></div>
-          <div class="legend">
-            <span><i class="swatch" style="background:var(--negative)"></i> pushes toward the prediction</span>
-            <span><i class="swatch" style="background:var(--positive)"></i> pushes away from it</span>
-            <span>hover a word for its weight</span>
-          </div>
         </div>
         <div>
-          <h3 style="margin-bottom:10px">Confidence</h3>
+          <h3>Class probabilities</h3>
           <div class="bars" id="predict-bars"></div>
           <p class="hint" id="predict-note" style="margin-top:14px"></p>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ============================================================ COMPARE -->
-  <section class="view" id="view-compare">
-    <div class="card">
-      <div class="card-head"><h2>One sentence, three models</h2></div>
-      <p class="hint">
-        The same input scored by a general-purpose lexicon, a model built on
-        pretrained general-English vectors, and a model trained on StackOverflow.
-        Where they disagree is the whole project in one screen.
-      </p>
-
-      <textarea id="compare-text">Kill the process before restarting the server.</textarea>
-
-      <div class="row" style="margin-top:12px">
-        <select id="cmp-a" class="grow"></select>
-        <select id="cmp-b" class="grow"></select>
-        <select id="cmp-c" class="grow"></select>
-        <button class="btn" id="compare-go">Compare</button>
-      </div>
-      <div class="chipset" id="compare-examples" style="margin-top:12px"></div>
-    </div>
-
-    <div id="compare-out"></div>
-  </section>
-
-  <!-- ============================================================ RESULTS -->
-  <section class="view" id="view-results">
-    <div class="grid-3" id="results-stats"></div>
+    <div class="grid-3" id="metrics" style="margin-top:16px"></div>
 
     <div class="card">
-      <div class="card-head">
-        <h2>All 15 models on the held-out test split</h2>
-        <p class="hint">click a column to sort</p>
-      </div>
-      <div class="table-wrap"><table id="results-table">
-        <thead></thead><tbody></tbody>
-      </table></div>
-      <p class="hint" style="margin-top:12px">
-        The test split was read exactly once, after every decision had been made
-        on training and validation data.
-      </p>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <h2 style="margin-bottom:12px">Best model per representation</h2>
-        <div class="fa-chart" id="results-by-rep"></div>
-      </div>
-      <div class="card">
-        <h2 style="margin-bottom:12px">Generative vs discriminative</h2>
-        <div class="fa-chart" id="results-by-kind"></div>
-        <p class="hint" style="margin-top:12px">
-          Mean test macro-F1. McNemar between the best TF-IDF and best embedding
-          model gives <code>p = 4.7e-9</code>.
-        </p>
-      </div>
+      <div class="card-head"><h2>Stress-test performance</h2></div>
+      <div class="table-wrap"><table id="stress-table"><thead></thead><tbody></tbody></table></div>
     </div>
   </section>
-
-  <!-- ============================================================= STRESS -->
-  <section class="view" id="view-stress">
-    <div class="card">
-      <div class="card-head"><h2>Why this stage exists</h2></div>
-      <div class="callout">
-        <strong>Senti4SD contains almost none of the vocabulary this project is about.</strong>
-        <code>fatal</code> 0&times;, <code>hang</code> 0&times;, <code>abort</code> 0&times;,
-        <code>kill</code> 3&times; in 3,031 posts. Four separate analyses agree. So the
-        claim is tested on 60 sentences written for the purpose: 40 harsh-but-neutral,
-        20 genuine complaints, 10 minimal pairs.
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">
-        <h2>False alarms on harsh-but-neutral sentences</h2>
-        <p class="hint">lower is better</p>
-      </div>
-      <div class="fa-chart" id="stress-family"></div>
-      <p class="hint" style="margin-top:14px">
-        The rate tracks how much general English each representation carries.
-        Pretrained GloVe inherits the bias; vectors learned on StackOverflow
-        largely avoid it.
-      </p>
-    </div>
-
-    <div class="card">
-      <div class="card-head">
-        <h2>Every model on the stress set</h2>
-        <p class="hint">click a column to sort</p>
-      </div>
-      <div class="table-wrap"><table id="stress-table">
-        <thead></thead><tbody></tbody>
-      </table></div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">
-        <h2>The 60 sentences</h2>
-        <div class="chipset" id="stress-filters"></div>
-      </div>
-      <div class="table-wrap"><table id="stress-sentences">
-        <thead></thead><tbody></tbody>
-      </table></div>
-    </div>
-  </section>
-
-  <!-- =========================================================== FINDINGS -->
-  <section class="view" id="view-findings">
-    <div class="card">
-      <div class="card-head"><h2>The same word, two meanings</h2></div>
-      <p class="hint">
-        Nearest neighbours of each probe word. GloVe learned these words from
-        Wikipedia and news; Word2Vec learned them from StackOverflow.
-      </p>
-      <div class="table-wrap"><table id="neighbours-table">
-        <thead></thead><tbody></tbody>
-      </table></div>
-      <p class="hint" style="margin-top:12px">
-        GloVe places <code>kill</code> beside <em>shoot</em> and <em>poison</em>,
-        <code>abort</code> beside <em>fetuses</em>. Word2Vec's lists are noise
-        because the words barely occur &mdash; which the frequency column shows.
-      </p>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-head"><h2>Do compound phrases survive?</h2></div>
-        <div class="table-wrap"><table id="phrases-table">
-          <thead></thead><tbody></tbody>
-        </table></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>Stemming: measured, not assumed</h2></div>
-        <div class="table-wrap"><table id="ablation-table">
-          <thead></thead><tbody></tbody>
-        </table></div>
-        <p class="hint" style="margin-top:12px">
-          The gap between <code>none</code> and <code>stem</code> is about
-          <strong>2 of 650</strong> validation documents &mdash; noise. The two
-          metrics also disagree, which is the project's trade-off in miniature.
-        </p>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-head"><h2>What the model actually keys on</h2></div>
-        <p class="hint">Mean weight toward <em>negative</em> on gold-neutral posts.</p>
-        <div class="table-wrap"><table id="tokens-table">
-          <thead></thead><tbody></tbody>
-        </table></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>LIME and SHAP agree</h2></div>
-        <div id="agreement-plot"></div>
-        <p class="hint" style="margin-top:10px">
-          Spearman <strong>0.872</strong> over 80 shared tokens. Two different
-          methods converging is evidence both describe the model rather than
-          their own sampling noise. LIME stability across 5 seeds: mean Jaccard
-          <strong>0.907</strong>.
-        </p>
-      </div>
-    </div>
-  </section>
-
 </main>
-
 <script src="app.js"></script>
 </body>
 </html>

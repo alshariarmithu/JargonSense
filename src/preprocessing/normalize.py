@@ -91,8 +91,6 @@ def ensure_nltk_data() -> None:
             nltk.download(package, quiet=True)
 
 
-ensure_nltk_data()
-
 _PORTER = PorterStemmer()
 _SNOWBALL = SnowballStemmer("english")
 _LEMMATIZER = WordNetLemmatizer()
@@ -113,6 +111,7 @@ def segment(text) -> list[str]:
     stripped = str(text).strip()
     if not stripped:
         return []
+    ensure_nltk_data()
     return nltk.sent_tokenize(stripped)
 
 
@@ -204,6 +203,7 @@ def normalize_tokens(text, mode: str = "none", stemmer: str = "porter") -> list[
 
     # mode == "lemma": tag the whole sentence at once, because a tagger needs
     # surrounding words to tell a noun from a verb.
+    ensure_nltk_data()
     tagged = nltk.pos_tag(tokens)
     return [
         token if token in _PLACEHOLDER_SET
