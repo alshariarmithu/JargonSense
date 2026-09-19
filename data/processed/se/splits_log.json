@@ -1,0 +1,30 @@
+{
+  "domain": "se",
+  "seed": 42,
+  "total_rows": 4331,
+  "train_rows": 3031,
+  "val_rows": 650,
+  "test_rows": 650,
+  "distributions": {
+    "overall": {
+      "negative": 1176,
+      "neutral": 1662,
+      "positive": 1493
+    },
+    "train": {
+      "negative": 823,
+      "neutral": 1163,
+      "positive": 1045
+    },
+    "val": {
+      "negative": 177,
+      "neutral": 249,
+      "positive": 224
+    },
+    "test": {
+      "negative": 176,
+      "neutral": 250,
+      "positive": 224
+    }
+  }
+}
