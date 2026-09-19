@@ -1,0 +1,4 @@
+mode,vocabulary_size,accuracy,macro_f1,neutral_to_negative_rate
+none,12723,0.7938,0.7863,0.1044
+lemma,12186,0.7831,0.7754,0.1124
+stem,12371,0.7908,0.7844,0.1004

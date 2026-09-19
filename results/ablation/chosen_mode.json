@@ -1,0 +1,30 @@
+{
+  "mode": "none",
+  "selected_by": "macro_f1",
+  "domain": "se",
+  "scored_on": "validation",
+  "model": "tfidf12_lr_defaults",
+  "results": [
+    {
+      "mode": "none",
+      "vocabulary_size": 12723,
+      "accuracy": 0.7938,
+      "macro_f1": 0.7863,
+      "neutral_to_negative_rate": 0.1044
+    },
+    {
+      "mode": "lemma",
+      "vocabulary_size": 12186,
+      "accuracy": 0.7831,
+      "macro_f1": 0.7754,
+      "neutral_to_negative_rate": 0.1124
+    },
+    {
+      "mode": "stem",
+      "vocabulary_size": 12371,
+      "accuracy": 0.7908,
+      "macro_f1": 0.7844,
+      "neutral_to_negative_rate": 0.1004
+    }
+  ]
+}

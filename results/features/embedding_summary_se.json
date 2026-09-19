@@ -1,0 +1,31 @@
+{
+  "domain": "se",
+  "mode": "none",
+  "glove_model": "glove-wiki-gigaword-100",
+  "w2v_settings": {
+    "vector_size": 100,
+    "window": 5,
+    "min_count": 2,
+    "sg": 1,
+    "negative": 5,
+    "epochs": 30,
+    "seed": 42,
+    "workers": 1
+  },
+  "oov": [
+    {
+      "embedding": "glove",
+      "vocabulary_size": 400000,
+      "oov_token_rate": 0.0244,
+      "documents_with_no_known_tokens": 9,
+      "placeholders_known": "(none)"
+    },
+    {
+      "embedding": "w2v",
+      "vocabulary_size": 3752,
+      "oov_token_rate": 0.0388,
+      "documents_with_no_known_tokens": 0,
+      "placeholders_known": "CODE, URL, USER, EMO_POS, EMO_NEG"
+    }
+  ]
+}

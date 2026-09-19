@@ -9,9 +9,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 
-# This module only ever writes PNG files, so it must not try to open a GUI
-# window.  Without this, importing pyplot picks the interactive Tk backend and
-# crashes under pytest and on any machine without a display.
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -22,14 +20,20 @@ from src.extraction.clean_text import LABELS
 
 from src.paths import ROOT
 
-def evaluate(name: str, domain: str, y_true: Sequence[str], y_pred: Sequence[str], out_dir: str = "results/metrics") -> dict:
+def evaluate(name: str, domain: str, y_true: Sequence[str], y_pred: Sequence[str],
+             out_dir: str = "results/metrics",
+             fig_dir: str = "results/figures") -> dict:
     """
     Computes accuracy, macro-F1, weighted-F1, per-class P/R/F1, and confusion matrices.
-    Saves metrics to JSON and confusion matrix to a PNG file.
+    Saves metrics to JSON and the confusion matrix to a PNG file.
+
+    ``fig_dir`` is separate from ``out_dir`` so that callers redirecting their
+    metrics elsewhere -- tests, in particular -- can redirect the figures too.
+    Otherwise a test run leaves stray PNGs in the real results folder.
     """
     out_path = ROOT / out_dir
     out_path.mkdir(parents=True, exist_ok=True)
-    fig_path = ROOT / "results/figures"
+    fig_path = ROOT / fig_dir
     fig_path.mkdir(parents=True, exist_ok=True)
 
     y_true = np.array(y_true)
@@ -91,11 +95,17 @@ def evaluate(name: str, domain: str, y_true: Sequence[str], y_pred: Sequence[str
 
 def append_to_results_table(name: str, domain: str, metrics: dict, table_path: str = "results/metrics/all_results.csv"):
     """
-    Appends the evaluation metrics to the master results CSV.
+    Records one model's metrics as a row in the master results CSV.
+
+    A model is identified by ``(domain, model_name)``.  Re-running an
+    experiment *replaces* its existing row rather than adding a second one,
+    so the table always holds exactly one row per model and can be read
+    straight into the report.  Row order is preserved on update, so the table
+    does not reshuffle itself every time one model is re-run.
     """
     file_path = ROOT / table_path
     file_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     row = {
         "domain": domain,
         "model_name": name,
@@ -113,11 +123,23 @@ def append_to_results_table(name: str, domain: str, metrics: dict, table_path: s
     row["health_positive_to_negative_rate"] = metrics.get("health_positive_to_negative_rate", 0.0)
     
     df_row = pd.DataFrame([row])
-    
+
     if file_path.exists():
-        df_row.to_csv(file_path, mode='a', header=False, index=False)
+        table = pd.read_csv(file_path)
+        is_same_model = (table["domain"] == domain) & (table["model_name"] == name)
+        if is_same_model.any():
+            # Overwrite the existing row in place, keeping its position.
+            position = table.index[is_same_model][0]
+            table = table.drop(index=table.index[is_same_model])
+            table = pd.concat(
+                [table.iloc[:position], df_row, table.iloc[position:]]
+            ).reset_index(drop=True)
+        else:
+            table = pd.concat([table, df_row], ignore_index=True)
     else:
-        df_row.to_csv(file_path, index=False)
+        table = df_row
+
+    table.to_csv(file_path, index=False)
 
 def mcnemar_test(y_true: Sequence[str], y_pred1: Sequence[str], y_pred2: Sequence[str]) -> dict:
     """

@@ -1,0 +1,10 @@
+model,config,classifier,kind,best_params,cv_macro_f1,val_accuracy,val_macro_f1,val_neutral_to_negative,val_negative_recall,fit_seconds
+tfidf13_svm,tfidf13,svm,discriminative,"{""estimator__C"": 1, ""estimator__class_weight"": ""balanced""}",0.8033,0.8108,0.8058,0.1406,0.7175,9.9
+tfidf13_lr,tfidf13,lr,discriminative,"{""C"": 10, ""class_weight"": ""balanced""}",0.8007,0.8062,0.8007,0.1446,0.7062,14.2
+tfidf12_svm,tfidf12,svm,discriminative,"{""estimator__C"": 1, ""estimator__class_weight"": null}",0.8016,0.8046,0.7993,0.1446,0.6949,7.2
+tfidf11_lr,tfidf11,lr,discriminative,"{""C"": 1, ""class_weight"": ""balanced""}",0.8074,0.8015,0.7978,0.1406,0.7232,4.5
+tfidf12_lr,tfidf12,lr,discriminative,"{""C"": 1, ""class_weight"": ""balanced""}",0.8033,0.7969,0.7939,0.1606,0.7345,6.6
+tfidf11_svm,tfidf11,svm,discriminative,"{""estimator__C"": 0.1, ""estimator__class_weight"": ""balanced""}",0.8038,0.8,0.7929,0.1325,0.6667,4.2
+tfidf12_mnb,tfidf12,mnb,generative,"{""alpha"": 0.1}",0.757,0.7554,0.7466,0.1285,0.5819,2.2
+tfidf13_mnb,tfidf13,mnb,generative,"{""alpha"": 0.1}",0.7473,0.7369,0.7305,0.1486,0.5876,3.3
+tfidf11_mnb,tfidf11,mnb,generative,"{""alpha"": 0.5}",0.7326,0.7338,0.7237,0.0924,0.5311,5.9

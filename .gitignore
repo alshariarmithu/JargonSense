@@ -6,7 +6,9 @@ __pycache__/
 .ipynb_checkpoints/
 
 
-models/
+# Leading slash matters: a bare "models/" also matches results/models/,
+# which holds experiment tables that must be committed.
+/models/
 *.joblib
 glove*.txt
 *.kv
@@ -16,3 +18,8 @@ data/raw/
 data/raw/druglib/
 data/raw/senti4sd/
 data/interim/
+
+# test artifacts
+.pytest_cache/
+results/metrics_test/
+results/figures_test/

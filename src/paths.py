@@ -35,6 +35,7 @@ METRICS = RESULTS / "metrics"
 METRICS_TEST = RESULTS / "metrics_test"
 FIGURES = RESULTS / "figures"
 ABLATION = RESULTS / "ablation"
+FEATURES = RESULTS / "features"
 EXPLANATIONS = RESULTS / "explanations"
 
 MODELS = ROOT / "models"

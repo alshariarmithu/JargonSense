@@ -1,86 +1,67 @@
-# Interpretable Sentiment Classification Across Two Technical Domains
+# Interpretable Sentiment Classification in Software Engineering Communication
 
-CSE 4122 course project. The thesis: **domain-specific vocabulary breaks sentiment
-models, and the failure mode generalises.** Two unrelated corpora, one shared
-pipeline, plus cross-domain transfer experiments.
+**CSE 4122 course project** · Al Shariar Hossain (2107066) · Hassan Mohammed Naquibul Hoque (2107077)
 
-| Domain | Corpus | The vocabulary problem |
-|---|---|---|
-| `se` | Senti4SD gold standard (StackOverflow) | Harsh technical jargon that is functionally neutral — *fatal error*, *kill the process*, *crashed* |
-| `health` | UCI Drug Reviews, Druglib.com (id 461) | Relief inversion — a clinically negative word naming a symptom that went away: *the nausea stopped*, *no more panic attacks* |
+Sentiment models trained on general English misread software engineering text.
+Words like *fatal error*, *kill the process* and *crashed* sound hostile but are
+functionally neutral to a developer. This project builds a sentiment classifier for
+StackOverflow posts and then uses **explainability methods to audit *why* it
+succeeds or fails** on that vocabulary — not just to measure accuracy.
 
-Full task breakdown and ownership: [project_work_division.md](project_work_division.md).
+**The problem, already measured.** VADER, a standard general-purpose sentiment
+lexicon, calls **25.2% of genuinely neutral StackOverflow posts negative**:
+
+| Baseline | Accuracy | Macro-F1 | Gold-neutral called negative |
+|---|---|---|---|
+| Majority class | 0.385 | 0.185 | — |
+| **VADER** | 0.715 | 0.708 | **25.2%** |
+
+One in four. That is the problem this project investigates, quantified before a
+single model was trained.
+
+Full task breakdown, schedule and scope decisions: **[project_plan.md](project_plan.md)**
 
 ---
 
 ## The pipeline
 
-Six stages, run **once per domain, one domain at a time**.
+Six stages. Each produces a file the next one consumes, so the whole project
+re-runs from raw data with a handful of commands.
 
 ```
-Stage 1  Data acquisition
-Stage 2  Text extraction & clean-up
-Stage 3  Preprocessing        (sentence segmentation, stemming, lemmatization)
-Stage 4  Feature engineering
-Stage 5  Model building
-Stage 6  Evaluation
-─────────────────────────────────────────────────────────────
-Stage 7  Cross-domain integration  (transfer, demos, report)
+Stage 1  Data acquisition        Senti4SD gold standard
+Stage 2  Text extraction         raw .xlsx  ->  clean.csv, plus clean()
+Stage 3  Preprocessing           sentence segmentation, stemming, lemmatization
+Stage 4  Feature engineering     TF-IDF (1,1)(1,2)(1,3), GloVe, Word2Vec
+Stage 5  Model building          Naive Bayes, Logistic Regression, Linear SVM
+Stage 6  Evaluation              metrics, LIME, SHAP, stress test, demo
 ```
-
-**Order is fixed: finish SE completely, then start HEALTH.**
-
-```
-TRACK SE      Stage 1 → 2 → 3 → 4 → 5 → 6   ──▶ SE GATE
-TRACK HEALTH  Stage 1 → 2 → 3 → 4 → 5 → 6   ──▶ HEALTH GATE
-TRACK JOINT   Stage 7                        ──▶ SUBMISSION
-```
-
-Why: the health corpus is blocked on 835 rows of hand-labelling, and under the old
-parallel plan that blocked the SE work too — which needs no hand-labelling at all.
-The pipeline is domain-agnostic, so once it runs end-to-end on SE, the HEALTH track
-is mostly configuration. The cost is that cross-domain transfer lands in the final
-two weeks; the mitigation is a smoke-transfer check in Stage H-5.
-
-The one sanctioned exception: **health neutral hand-labelling runs in the background
-from Week 2**, because it is human time that cannot be compressed later. Nothing
-else from the HEALTH track starts early.
 
 ---
 
 ## Status
 
-**Current track: SE.** Stages 1, 2 and part of 3 are done. Stage 3's normalization
-module is the next thing to write.
+| Stage | Component | Status |
+|---|---|---|
+| 1 | Data acquisition | ✅ done |
+| 2 | Corpus extraction — 4,331 rows, Fleiss' κ = 0.759 | ✅ done |
+| 2 | String clean-up (`clean_text.py`) | ✅ done — 36 tests |
+| 3 | Segmentation / stemming / lemmatization | ✅ done — 23 tests |
+| 3 | Normalization ablation | ✅ done — chose `none` |
+| 3 | Splits — 3,031 / 650 / 650, frozen | ✅ done |
+| 4 | TF-IDF features | ✅ done — 17 tests |
+| 4 | GloVe + Word2Vec | ✅ done — 16 tests |
+| 5 | 9 TF-IDF models | ✅ done — 19 tests |
+| 5 | 6 embedding models | ✅ done |
+| 6 | Evaluation framework | ✅ done |
+| 6 | Baselines (majority, VADER) | ✅ done |
+| 6 | Final test evaluation + error analysis | ✅ done |
+| 6 | LIME / SHAP | ✅ done |
+| 6 | Stress test (60 sentences) | ✅ done |
+| 6 | Notebook demo | ✅ done |
+| — | Report | ✅ [report/REPORT.md](report/REPORT.md) |
 
-| Stage | Component | SE | HEALTH |
-|---|---|---|---|
-| 1 | Data acquisition | ✅ done | ✅ done |
-| 2 | Corpus extraction | ✅ **frozen** — 4,331 rows, Fleiss' κ = 0.759 | ⚠️ 1,341 rows, **0 neutral** — needs 835 hand-labelled |
-| 2 | String clean-up (`clean_text.py`) | ✅ done — 36 tests passing | ✅ same module, health branch |
-| 2 | Label validation | — | ⏸ scorer ready, 100 rows awaiting hand-labelling |
-| 3 | Segmentation / stemming / lemmatization | ❌ **not started** | ⏸ blocked on SE |
-| 3 | Normalization ablation | ❌ **not started** | ⏸ blocked on SE |
-| 3 | Splits | ✅ frozen — 3,031 / 650 / 650 | ⚠️ exist but **invalid** (built from the 0-neutral corpus) |
-| 4 | Feature engineering | ❌ not started | ⏸ blocked |
-| 5 | Model building | ❌ not started | ⏸ blocked |
-| 6 | Evaluation framework | ✅ done | ✅ same module |
-| 6 | Baselines | ✅ majority + VADER | ⚠️ provisional — must be re-run |
-| 6 | LIME / SHAP / stress tests | ❌ not started | ⏸ blocked |
-| 7 | Transfer, demos, report | ❌ not started | |
-
-**Blocking issue — the environment does not match `requirements.txt`.** `.venv`
-currently has only `pandas` installed, at **3.0.6** against a pinned **2.2.3**, so
-`tests/test_evaluate.py` cannot even be collected (`No module named 'matplotlib'`).
-Fix this before starting Stage 3:
-
-```bash
-.venv/Scripts/activate
-pip install -r requirements.txt
-python -m pytest -q          # must collect and pass cleanly
-```
-
-See [SE GATE](#-se-gate) for what still stands between here and the HEALTH track.
+**123 tests passing.** The pipeline reproduces end to end from raw data.
 
 ---
 
@@ -94,57 +75,59 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Download both raw corpora (~700 MB, mostly the Senti4SD word-embedding model):
+Download the corpus:
 
 ```bash
 python -m src.acquisition.download
 ```
 
-**Run every command from the repository root**, using `python -m`. The modules
-import each other as `src.<stage>.<module>`, so invoking a file by path will fail.
+**Run every command from the repository root**, using `python -m`. Modules import
+each other as `src.<stage>.<module>`, so running a file by path will fail.
 
 ---
 
 ## Running the pipeline
 
-Stage by stage. `--domain` selects the corpus; **only run `health` after the SE
-GATE is signed.**
-
 ```bash
-# Stage 1 — acquisition
-python -m src.acquisition.download
+# Stage 2 — build the corpus from the raw workbook
+python -m src.extraction.build_se
 
-# Stage 2 — extraction & clean-up
-python -m src.extraction.build_se              # -> data/processed/se/
-python -m src.extraction.build_health          # -> data/processed/health/
-python -m src.extraction.validate_health       # scores the label validation
-
-# Stage 3 — preprocessing
+# Stage 3 — create the frozen train/val/test splits
 python -m src.preprocessing.splits --domain se
-# normalize.py and the ablation: not written yet
 
-# Stage 6 — evaluation
+# Stage 6 — the two reference points every model must beat
 python -m tools.run_baselines --domain se
-python -m tools.make_examples                      # -> report/preprocess_examples.md
 
+# Stage 3 — decide stem / lemmatize / neither (writes the decision to disk)
+python -m tools.run_ablation
+
+# Stage 4 — TF-IDF vocabulary, compound-phrase and tuning analysis
+python -m src.features.features_tfidf
+
+# Stage 4 — GloVe vs self-trained Word2Vec (downloads GloVe once, ~128 MB)
+python -m src.features.features_embed
+
+# Stage 5 — train and tune all 15 models (~3 minutes)
+python -m src.modeling.models_tfidf
+python -m src.modeling.models_embed
+
+# Stage 6 — spend the test split, once
+python -m tools.run_final_evaluation
+
+# Stage 6 — explainability and the stress test
+python -m src.evaluation.explain_lime
+python -m src.evaluation.explain_shap
+python -m src.evaluation.stress_test
+
+# regenerate the report's preprocessing rule table
+python -m tools.make_examples
+
+# tests
 python -m pytest -q
 ```
 
-`build_se` must run before `build_health`: the health corpus is balanced to the SE
-class proportions, which `build_se` writes to
-`data/processed/se/build_log.json`. Without it, `build_health` falls back to a
-uniform target and says so.
-
-Useful flags:
-
-```bash
-python -m src.extraction.build_health --inspect               # rows each filter removed
-python -m src.extraction.build_health --neutral-min-words 8   # see the length trade-off
-python -m src.extraction.validate_health --annotator2 FILE    # inter-annotator Cohen's κ
-```
-
 Every script writes a `build_log.json` next to its output holding every count it
-reports. **Those numbers go straight into the report — don't retype them by hand.**
+reports. **Those numbers go into the report — don't retype them by hand.**
 
 ---
 
@@ -152,83 +135,64 @@ reports. **Those numbers go straight into the report — don't retype them by ha
 
 ```
 src/
+  paths.py                  every path in the project, defined once
   acquisition/
-    download.py                   fetches both raw corpora
+    download.py             fetches the raw corpus
   extraction/
-    build_se.py                   Senti4SD .xlsx -> clean.csv        [A]
-    build_health.py               Druglib .tsv   -> clean.csv        [B]
-    validate_health.py            rating-vs-human agreement scorer   [B]
-    clean_text.py                 clean(), tokenize(), TOKEN_PATTERN [A]
+    build_se.py             raw .xlsx -> clean.csv, Fleiss' kappa
+    clean_text.py           clean(), tokenize(), TOKEN_PATTERN
   preprocessing/
-    normalize.py                  segmentation / stemming / lemma    [A]  NOT WRITTEN
-    splits.py                     70/15/15 stratified, seed 42       [B]
+    splits.py               70/15/15 stratified, seed 42, frozen
+    normalize.py            segmentation / stemming / lemmatization
   features/
-    features_tfidf.py             unigram, (1,2), (1,3)              [A]  NOT WRITTEN
-    features_embed.py             GloVe + per-domain Word2Vec        [B]  NOT WRITTEN
+    features_tfidf.py       unigram, (1,2), (1,3)
+    features_embed.py       GloVe + self-trained Word2Vec
   modeling/
-    models_tfidf.py               MNB, LR, LinearSVC                 [A]  NOT WRITTEN
-    models_embed.py               GNB, LR, LinearSVC                 [B]  NOT WRITTEN
+    models_tfidf.py         MNB, LR, LinearSVC
+    models_embed.py         GNB, LR, LinearSVC
   evaluation/
-    evaluate.py                   metrics, confusion, McNemar        [B]
-    explain_lime.py                                                  [A]  NOT WRITTEN
-    explain_shap.py                                                  [B]  NOT WRITTEN
-    stress_test.py                                                   [B]  NOT WRITTEN
-  integration/
-    transfer.py                   the 2×2 transfer matrix            [A]  NOT WRITTEN
-    compare_explainers.py         LIME vs SHAP agreement           [Joint] NOT WRITTEN
+    evaluate.py             metrics, confusion matrices, McNemar
+    explain_lime.py         LIME: per-instance, aggregate, stability
+    explain_shap.py         SHAP: exact linear + model-agnostic
+    stress_test.py          the 60-sentence stress set
 
 data/
-  raw/senti4sd/                   never edited; git-ignored
-  raw/druglib/                    never edited; git-ignored (licence)
+  raw/senti4sd/             never edited; git-ignored
   processed/se/
-    clean.csv                     id;text;polarity  (4,331 rows)
+    clean.csv               id;text;polarity  (4,331 rows)
     train.csv val.csv test.csv    frozen, seed 42
-    build_log.json                filter counts, Fleiss' κ, class distribution
-  processed/health/
-    clean.csv                     id;text;polarity  (1,341 rows, no neutrals yet)
-    bias_probe.csv                benefits/side-effects text for Stage H-6.6
-    neutral_candidates.csv        1,200 pre-scored rows to hand-label
-    validation_sample.csv         100 rows to hand-label for the κ check
-    build_log.json                every filter and balance count
-  stress_test/                    se_stress.csv, health_stress.csv     NOT WRITTEN
-  lexicons/                       se_jargon.txt, health_symptoms.txt   NOT WRITTEN
+    build_log.json          filter counts, Fleiss' kappa, class distribution
+  stress_test/se_stress.csv 60 hand-written sentences
+  lexicons/se_jargon.txt    43 SE jargon words
 
-cli/predict.py                    CLI demo with --compare            [A]  NOT WRITTEN
-notebooks/demo.ipynb              notebook demo                      [B]  NOT WRITTEN
-models/{se,health}/               saved .joblib pipelines; git-ignored
 results/
-  metrics/  metrics_test/  figures/  ablation/  explanations/  transfer/
-report/preprocess_examples.md     generated; do not edit
-tools/                            helper scripts, not part of the pipeline
-tests/                            one module per stage
+  metrics/                  one JSON per model + all_results.csv
+  figures/                  confusion-matrix heatmaps, charts
+  ablation/                 normalization comparison
+  explanations/             LIME and SHAP output
+models/se/                  saved .joblib pipelines; git-ignored
+notebooks/demo.ipynb        interactive demo (+ demo.html, exported)
+report/REPORT.md            the full write-up
+report/preprocess_examples.md   generated; do not edit
+tools/                      helper scripts, not part of the pipeline
+tests/                      123 tests
 ```
-
-**Renamed in the stage restructure:** `src/preprocess.py` →
-`src/extraction/clean_text.py`, and `preprocess(text, domain)` →
-`clean(text, domain)`. The old name collided with Stage 3, which is the stage
-actually called "preprocessing". What the module does — HTML unescape, placeholders,
-lowercase, emoticons, negation expansion, character collapsing — is clean-up, which
-is Stage 2. **The rules themselves are unchanged.**
 
 ---
 
-## Stage 1–2 — Corpus statistics
+## The corpus
 
-Recorded from the build logs, not by eye. Both corpora use the project CSV contract:
-`id;text;polarity`, semicolon-delimited, UTF-8 without BOM, labels ordered
-`["negative", "neutral", "positive"]`, seed `42`.
+`data/processed/se/clean.csv` — built by `src/extraction/build_se.py` from
+`Senti4SD_GoldStandard_EmotionPolarity.xlsx`.
 
-### SE — `data/processed/se/clean.csv` ✅ frozen
-
-Source: `Senti4SD_GoldStandard_EmotionPolarity.xlsx`. The workbook is used rather
-than Senti4SD's train/test partition CSVs because it holds the same 4,423 items
-*plus* the `r1`/`r2`/`r3` rater columns, without which agreement cannot be computed.
+The workbook is used rather than Senti4SD's ready-made train/test CSVs because it
+carries the `r1`/`r2`/`r3` rater columns, without which inter-rater agreement
+cannot be computed.
 
 | | |
 |---|---|
 | Rows loaded | 4,423 |
-| Dropped: duplicate text | 92 |
-| Dropped: empty / bad label | 0 |
+| Duplicates dropped | 92 |
 | **Final** | **4,331** |
 | Fleiss' κ | **0.7586** over 4,359 items, 3 raters |
 | Mean length | 29.97 words |
@@ -239,342 +203,470 @@ than Senti4SD's train/test partition CSVs because it holds the same 4,423 items
 | neutral | 1,662 | 38.37% |
 | positive | 1,493 | 34.47% |
 
-The κ of 0.759 clears the SE GATE's 0.75 threshold. Items where any rater was
-missing or unparseable are excluded from κ (the rater columns are free text — mixed
-case plus the typos `Postive`, `Poitive`, `Netural`, which are repaired first).
+Splits: **3,031 train / 650 validation / 650 test**, stratified, seed 42, frozen.
 
-**Splits (frozen, seed 42):** 3,031 train / 650 val / 650 test. Class proportions
-hold to within one row per class.
-
-### Health — `data/processed/health/clean.csv` ⚠️ incomplete
-
-Only `commentsReview` is used as training text. `benefitsReview` and
-`sideEffectsReview` are positive- and negative-leaning *by construction*, so they are
-useless as training data and are set aside to `bias_probe.csv` for Stage H-6.6.
-
-| Filter | Rows removed |
-|---|---|
-| Rows loaded | 4,143 |
-| missing text | 13 |
-| boilerplate (`see above`, `none`, `thanks`) | 25 |
-| copy-pasted drug monograph | 24 |
-| under 15 words | 776 |
-| duplicate text | 61 |
-| **After filtering** | **3,261** |
-
-Rating bands (1–3 negative, 8–10 positive, 4–7 discarded):
-
-| Band | Count |
-|---|---|
-| negative (1–3) | 591 |
-| positive (8–10) | 1,823 |
-| discarded (4–7) | 847 |
-
-4–7 is **discarded, never mapped to neutral**. A mid rating means *mixed feelings*;
-Senti4SD neutral means *absence of affect*. Conflating the two would train the model
-to call emotionally intense text neutral and would silently destroy every
-cross-domain comparison.
-
-Current `clean.csv` holds **1,341 rows** (591 negative, 750 positive, **0 neutral**),
-mean 64.7 words — roughly twice the SE mean, which is worth noting when comparing the
-two domains.
-
-**The existing health splits are invalid** and must be regenerated once the corpus is
-complete; they were built from this 0-neutral version.
+Rater columns are free text with mixed case and the typos `Postive`, `Poitive`,
+`Netural`; these are repaired before computing kappa, and items where any rater is
+missing or unparseable are excluded.
 
 ---
 
-## The domain vocabulary problem
+## The vocabulary problem, in real data
 
-Real rows from the built corpora, for the report and the slides.
-
-**SE — jargon that is functionally neutral.** 40 of the 1,662 gold-neutral rows
-contain a word from the SE jargon lexicon:
+40 of the 1,662 gold-**neutral** posts contain a word from the SE jargon lexicon:
 
 - *i think that scope of 'killed' is ok.*
 - *You don't know if threads are killed unless you catch a signal that tells you so!*
 - *Try to add the complete failed message in the question!*
-- *Here, I see `BAADF00D` (bad food), `BEEFCACE` (beef cake), `BAADCAB1E` (bad cable), `BADCAFE` (bad cafe), and `DEADDEAD` (dead dead). Is this intentional?*
 - *Is GLUT dead for graphics programming?*
+- *Here, I see `BAADF00D` (bad food), `BEEFCACE` (beef cake), `BAADCAB1E` (bad cable), `BADCAFE` (bad cafe), and `DEADDEAD` (dead dead). Is this intentional?*
 
-**Health — relief inversion.** **197 of 750** positive rows contain a symptom word,
-and 50 of those pair it with relief framing (*no more*, *stopped*, *went away*,
-*gone*):
-
-- *The pain from the shots have practically disappeared.*
-- *The depression went away shortly after starting the Premarin.*
-- *After 4 days of the treatment, the swelling and the pain had almost gone.*
-- *At times I have stopped taking it for 30-50 days and the depression returns.*
-- *I cannot tolerate the pain without the Nortriptyline 50mg at bedtime.*
-
-The health share (26% of positives carrying negative-sounding vocabulary) is much
-higher than the SE one (2.4% of neutrals), so the two domains stress the model by
-different amounts — that asymmetry belongs in the results discussion, not hidden.
+A general-purpose sentiment model sees *killed*, *failed*, *dead* and predicts
+hostility. A developer sees ordinary technical description.
 
 ---
 
-## Stage 2 — Clean-up contract
+## Stage 2 — the clean-up contract
 
-`src/extraction/clean_text.py` is the single clean-up path for every model in
-both domains. It has no I/O and no pandas dependency, so it imports cleanly into
-tests, notebooks, sklearn pipelines and the CLI.
+`src/extraction/clean_text.py` is the single clean-up path for every model. It has
+no I/O and no pandas dependency, so it imports cleanly into tests, sklearn
+pipelines, the notebook and the report generator.
 
 ```python
 from src.extraction.clean_text import clean, tokenize, TOKEN_PATTERN
 
 clean("Kill the process before restarting", "se")
-clean("I take 600mg three times a day", "health")   # -> 'i take DOSE three times a day'
+clean("call foo(bar) and check a.b.c", "se")      # -> 'call CODE and check CODE'
 ```
 
-Shared rules, in order: `html.unescape` → lowercase → URLs `URL` → `@mentions`
-`USER` → **domain rules** → emoticons `EMO_POS`/`EMO_NEG` → negation expansion →
-collapse repeated characters and punctuation → squeeze whitespace.
-
-Domain rules are the **only** permitted divergence. `se`: code tags, backtick spans,
-`foo(bar)` calls and `a.b.c` paths → `CODE`. `health`: dosages → `DOSE`, remaining
-bare numbers → `NUM`.
+Rules, in order: `html.unescape` → lowercase → URLs `URL` → `@mentions` `USER` →
+domain rules → emoticons `EMO_POS`/`EMO_NEG` → negation expansion → collapse
+repeated characters and punctuation → squeeze whitespace.
 
 **Stopword removal is off, permanently.** Negation words appear in every standard
-stopword list, and removing them would break both domains at once — in the health
-corpus, negation *is* the effect.
+stopword list, and negation flips sentiment.
 
-`TOKEN_PATTERN` is the single source of truth for tokenisation and must be passed to
-`TfidfVectorizer(token_pattern=...)` in Stage 4 and to
-`LimeTextExplainer(split_expression=...)` in Stage 6, so the three cannot drift
+`TOKEN_PATTERN` is the single source of truth for tokenisation. It is passed to
+`TfidfVectorizer(token_pattern=…)` in Stage 4 and
+`LimeTextExplainer(split_expression=…)` in Stage 6, so the three cannot drift
 apart. A test enforces that it matches `tokenize()`.
 
-`report/preprocess_examples.md` is generated from `describe_rules()`, so the report's
-rule table cannot drift away from the code. **Regenerate it, never edit it by hand.**
+`report/preprocess_examples.md` is generated from `describe_rules()`, so the
+report's rule table cannot drift from the code. **Regenerate it; never edit it by
+hand.**
 
-### Two documented deviations from the plan's rule order
+### Two deliberate order choices
 
-Both are order-only; the set of rules is unchanged and still identical across
-domains, so no cross-domain comparison is affected.
-
-1. **Lowercasing moves from step 4 to step 2**, so every placeholder stays uppercase.
-   The literal words *url* and *user* are common in StackOverflow text; lowercase
-   placeholders would be indistinguishable from them and would silently corrupt the
-   TF-IDF vocabulary.
-2. **URL replacement runs before emoticon replacement.** `http://` contains `:/`, a
-   sad-face emoticon; the reverse order turns every URL into `httpEMO_NEG/...`.
+1. **Lowercasing runs second, not fourth**, so placeholders stay uppercase. The
+   literal words *url*, *user* and *code* are common in StackOverflow text, and
+   Stage 4 confirms the risk was real — in the training split the placeholder
+   `CODE` occurs in 174 posts while the ordinary English word *code* occurs in
+   303. Lowercase placeholders would have merged them into one meaningless
+   feature covering 477 posts.
+2. **URLs are replaced before emoticons.** `http://` contains `:/`, a sad-face
+   emoticon; the other order turns every URL into `httpEMO_NEG/...`.
 
 ---
 
-## Stage 3 — Preprocessing, and the stemming question
-
-**Not written yet. This is the next task.**
-
-Stage 3 adds sentence segmentation, stemming and lemmatization in
-`src/preprocessing/normalize.py`:
+## Stage 3 — preprocessing, and the stemming question
 
 ```python
-normalize(text, *, segment=False, mode="none")   # mode: "none" | "lemma" | "stem"
-```
+from src.preprocessing.normalize import normalize, segment
 
-### Why this stage is a measurement, not a formality
+normalize("the process was killed", mode="none")    # 'the process was killed'
+normalize("the process was killed", mode="lemma")   # 'the process be kill'
+normalize("the process was killed", mode="stem")    # 'the process wa kill'
+```
 
 Stemming and lemmatization collapse inflected forms:
 
 | Original | Stemmed | Lemmatized |
 |---|---|---|
 | killed, kills, killing | `kill` | `kill` |
-| stopped, stops, stopping | `stop` | `stop` |
 
-Normally that helps — fewer distinct tokens, denser counts, better learning from a
-small corpus. **Here it may destroy the finding**, because tense carries the
-sentiment in both domains:
+Normally this helps — fewer distinct tokens, denser counts on a small corpus.
+**Here it may erase the effect being studied.** *"Killed the process"* is routine
+technical usage; collapsing it into the emotional register of *kill* hides exactly
+the confusion LIME is meant to expose.
 
-- HEALTH: *"the nausea **stopped**"* (positive — relief) vs *"the nausea won't
-  **stop**"* (negative — ongoing). Stemmed, both are `stop`, and relief inversion
-  becomes unmeasurable.
-- SE: *"**killed** the process"* (neutral, routine) collapses into the emotional
-  register of *kill*, hiding the jargon effect LIME is meant to expose.
+So rather than asserting either position, the project **measures it**. The same
+model (TF-IDF (1,2) + Logistic Regression) is trained three times and scored on
+validation:
 
-### The resolution: implement it, switch it, measure it
+**Result** — `python -m tools.run_ablation`, scored on the validation split:
 
-Rather than asserting either position, Stage 3 runs an **ablation**: the same model
-(TF-IDF (1,2) + Logistic Regression, defaults) trained three times on the SE training
-split — `none`, `lemma`, `stem` — and scored on the SE **validation** split.
+| Mode | Vocabulary | Accuracy | Macro-F1 | neutral→negative |
+|---|---|---|---|---|
+| **none** | 12,723 | 0.7938 | **0.7863** | 10.4% |
+| lemma | 12,186 | 0.7831 | 0.7754 | 11.2% |
+| stem | 12,371 | 0.7908 | 0.7844 | **10.0%** |
 
-| Mode | Vocabulary size | Macro-F1 | neutral→negative rate |
+**Selected: `none`.** But the honest reading is that **normalization barely
+matters on this corpus.** The gap between `none` and `stem` is 0.0019 macro-F1 —
+about **2 documents out of 650**. That is noise, not evidence.
+
+So the real justification for `none` is not that it scored highest. It is that
+it keeps the inflections the project studies, and it is the simplest and fastest
+option. The score merely fails to argue against it.
+
+**One finding worth reporting:** the two metrics disagree. `none` wins on
+macro-F1, but `stem` has the *lowest* neutral→negative rate (10.0% vs 10.4%) —
+the project's actual failure metric. Accuracy and interpretability point in
+different directions, exactly the trade-off this project is about.
+
+The decision is written to `results/ablation/chosen_mode.json` and read by every
+later stage via `load_chosen_mode()`, so the mode used downstream is
+demonstrably the one this experiment produced rather than a hard-coded guess.
+
+**Three implementation details that matter:**
+
+- **Lemmatization is POS-aware.** `WordNetLemmatizer` assumes every word is a
+  noun unless told otherwise, so `lemmatize("stopped")` returns `stopped`
+  unchanged while `lemmatize("stopped", "v")` returns `stop`. Whole sentences
+  are tagged at once, because a tagger needs surrounding words to tell a verb
+  from a noun. A test enforces this.
+- **Placeholders are never normalized.** `URL`, `CODE`, `EMO_POS` and the rest
+  pass through untouched — stemming `CODE` to `code` would merge it with the
+  ordinary English noun and corrupt the vocabulary.
+- **All three modes share one tokenizer**, so the only difference between them
+  is the word-normalization step. A test asserts they produce identical token
+  counts; otherwise the ablation would be comparing two things at once.
+
+Sentence segmentation (`segment()`) reports that SE posts average **2.33
+sentences** (7,060 sentences across 3,031 training documents, longest 11). It is
+a measurement tool for the report — it does not alter the text fed to models.
+
+Run `python -m src.preprocessing.normalize` to see all of this demonstrated.
+
+---
+
+## Stage 4 — TF-IDF features
+
+`python -m src.features.features_tfidf`
+
+| Config | n-grams | Vocabulary | Sparsity | Features/doc |
+|---|---|---|---|---|
+| `tfidf11` | (1,1) | 3,449 | 0.9931 | 23.7 |
+| `tfidf12` | (1,2) | 12,723 | 0.9968 | 40.7 |
+| `tfidf13` | (1,3) | 17,902 | 0.9974 | 46.7 |
+
+Fitted on the 3,031 training documents only.
+
+### Most distinctive terms per class
+
+Ranking by mean TF-IDF returns `i, the, is, to` for every class — common words
+carry weight everywhere. Each term is instead scored by how much heavier it is
+*inside* a class than outside it, which makes the table informative:
+
+| Class | Top terms |
+|---|---|
+| negative | `EMO_NEG, sad, i, hate, horrible, afraid, not, terrible` |
+| neutral | `?, URL, you, use, how, what, see, the` |
+| positive | `!, excellent, thanks, great, EMO_POS, excellent !, thanks !, awesome` |
+
+Neutral is dominated by **question words** — most neutral StackOverflow posts are
+questions. Positive picks up the bigrams `excellent !` and `thanks !`, which the
+unigram model cannot represent.
+
+### ⚠️ The compound-phrase finding
+
+The project proposal motivates n-grams with *fatal error*, *kill the process* and
+*null pointer exception*. **None of those phrases occurs even once in the
+Senti4SD corpus:**
+
+| Phrase | In (1,1) | (1,2) | (1,3) | neg | neu | pos |
+|---|---|---|---|---|---|---|
+| fatal error | — | — | — | — | — | — |
+| null pointer | — | — | — | — | — | — |
+| kill the process | — | — | — | — | — | — |
+| null pointer exception | — | — | — | — | — | — |
+| **does not** | — | ✓ | ✓ | 46 | 52 | 26 |
+| **not work** | — | ✓ | ✓ | 12 | 17 | 5 |
+| **thank you** | — | ✓ | ✓ | 0 | 0 | 54 |
+| **does not work** | — | — | ✓ | 5 | 11 | 5 |
+| works fine | — | ✓ | ✓ | 1 | 2 | 7 |
+
+9 of 14 tested phrases reached the (1,3) vocabulary. **The five that did not are
+exactly the canonical SE-jargon examples.**
+
+Two consequences, both of which belong in the report:
+
+1. **The case for n-grams cannot rest on technical jargon here.** What bigrams
+   actually capture in this corpus is *negation* (`does not`, `not work`) and
+   *politeness* (`thank you`, 54 positive posts and 0 elsewhere).
+2. **The Stage 6 stress test becomes load-bearing, not supplementary.** It is the
+   only place the canonical phrases can be tested at all, because the corpus does
+   not contain them.
+
+### Tuning, and why the top scorer is not shipped
+
+`min_df` ∈ {1, 2, 5} × `max_features` ∈ {None, 20000, 50000}, Logistic Regression
+held at defaults, scored on validation.
+
+The highest score was `tfidf13` with `min_df=1` at **0.7960** macro-F1 — using
+**130,078 features for 3,031 documents** (43 per document) with a train/validation
+gap of **0.196**. That is memorization, and its lead over the default setting is
++0.0129, about **8 of 650 validation documents**.
+
+One standard error on a 650-document validation set is ≈0.016 macro-F1. So the
+selection rule is stated explicitly in the code:
+
+> among settings within one standard error of the best validation score, take the
+> smallest vocabulary
+
+This is the standard one-standard-error rule. It ships `min_df=5` for `tfidf11`
+and `tfidf12`, and `min_df=2` for `tfidf13` — smaller models, statistically
+indistinguishable scores, and explanations built from terms that appear in more
+than one post.
+
+**Every configuration has a train/validation gap of 0.13–0.20.** That is expected
+for a linear model on 3,031 short documents, and it is why Stage 5 tunes
+regularization (`C`) rather than trusting these defaults.
+
+---
+
+## Stage 4.2 — GloVe vs self-trained Word2Vec
+
+`python -m src.features.features_embed`
+
+| Embedding | Vocabulary | OOV tokens | Empty docs | Placeholders known |
+|---|---|---|---|---|
+| GloVe (pretrained) | 400,000 | 2.4% | 9 | none |
+| Word2Vec (self-trained) | 3,752 | 3.9% | 0 | `CODE, URL, USER, EMO_POS, EMO_NEG` |
+
+GloVe is lowercase general English, so it has **no vector for the placeholders**
+Stage 2 inserts — every code span in a post is invisible to it. Word2Vec learned
+them, because it was trained on the placeholder-bearing text.
+
+### The nearest-neighbour table
+
+The intended headline was: the same word, two different meanings, depending on
+which corpus taught it. **Half of that worked.**
+
+| Word | Times in training text | GloVe neighbours | Word2Vec neighbours |
 |---|---|---|---|
-| none | — | — | — |
-| lemma | — | — | — |
-| stem | — | — | — |
+| `kill` | **3** | killing, kills, destroy, shoot, attack, **poison** | activities, clarify, song, chain, exec |
+| `crash` | 9 | accident, crashes, plane, **collision, airplane** | bus, modifying, press, broadcast, gc |
+| `error` | 65 | errors, mistake, incorrect, fault | occurs, assertion, failed, failure, throws |
+| `exception` | 12 | exceptions, except, instance, example | damn, typical, weird, onchange, scared |
+| `fatal` | **0** | deadly, accident, deaths, **poisoning** | *out of vocabulary* |
+| `hang` | **0** | hung, kong, hong, indices | *out of vocabulary* |
+| `abort` | **0** | aborted, takeoff, **fetuses**, eject | *out of vocabulary* |
 
-→ `results/ablation/normalization_se.csv`
+**GloVe delivers the argument completely.** It places `kill` next to *shoot* and
+*poison*, `abort` next to *fetuses*, `crash` next to *airplane*. A general-English
+model reading a StackOverflow post genuinely does see violence and aviation
+disasters. That is the domain-shift claim, demonstrated rather than asserted.
 
-**The winning mode by validation macro-F1 becomes the project default** and is used
-unchanged for every later model in both domains. Whatever wins, the table is a report
-finding: if stemming raises macro-F1 but also raises the neutral→negative confusion
-rate, that is the accuracy/interpretability trade-off the whole project is about,
-caught in one table.
+**Word2Vec does not, and the frequency column says exactly why.** `kill` appears
+**3 times** in 3,031 documents; `fatal`, `hang` and `abort` appear **zero times**.
+Word2Vec needs hundreds of occurrences to place a word well. This is not a tuning
+problem — it is the corpus-size limitation the proposal already lists under
+Limitations, now measured instead of predicted.
 
-Implementation notes:
+Only `error` (65 occurrences) produces sensible domain neighbours — *assertion,
+failed, failure, throws* — which is itself the proof: given enough examples, the
+self-trained model does learn the technical sense.
 
-- **Segmentation** — NLTK `punkt`, exposed as `segment(text) -> list[str]`. Used for
-  per-sentence length statistics; it does **not** alter the text fed to the models.
-- **Stemming** — `PorterStemmer`, with `SnowballStemmer("english")` as the alternate.
-- **Lemmatization** — `WordNetLemmatizer` **with POS tags** from `nltk.pos_tag`.
-  Without POS tags, `stopped` lemmatizes to `stopped`, not `stop`, and the comparison
-  is meaningless.
-- Stopword removal stays off in all three modes.
+### This confirms the Stage 4.1 finding
 
-The ablation is re-run once on HEALTH in Stage H-3. **If a different mode wins there,
-do not switch** — keep the SE choice for both and report the disagreement. Different
-normalization per domain would confound every cross-domain comparison.
+Two independent analyses now say the same thing:
+
+| Stage | Finding |
+|---|---|
+| 4.1 | `fatal error`, `kill the process`, `null pointer exception` — **0 occurrences** |
+| 4.2 | `fatal` 0×, `hang` 0×, `abort` 0×, `kill` 3× |
+
+**The harsh SE vocabulary the proposal is built around is essentially absent from
+Senti4SD.** The corpus is StackOverflow *discussion*, not error output. This is
+the single most important thing to state in the report, and it makes the Stage 6
+stress test the only place the central claim can be tested directly.
+
+### Word2Vec settings
+
+`vector_size` ∈ {50, 100} × CBOW vs skip-gram, judged by downstream validation
+macro-F1 rather than by how the neighbour lists read:
+
+| vector_size | Algorithm | Val macro-F1 |
+|---|---|---|
+| 50 | CBOW | 0.6751 |
+| 50 | skip-gram | 0.6825 |
+| **100** | **CBOW** | **0.7043** |
+| 100 | skip-gram | 0.7042 |
+
+Dimension matters more than the algorithm; CBOW and skip-gram are tied at 100d.
+Total spread 0.029.
 
 ---
 
-## Stage 6 — Baselines so far
+## Stage 5 — the nine TF-IDF models
 
-| Domain | Model | Accuracy | Macro-F1 | SE neut→neg | HEALTH pos→neg |
+`python -m src.modeling.models_tfidf` — tuned by 5-fold cross-validation inside
+the training split, compared on validation. **The test split is untouched.**
+
+| Model | Kind | CV F1 | Val F1 | neut→neg | neg recall |
 |---|---|---|---|---|---|
-| se | majority | 0.385 | 0.185 | — | — |
-| se | vader | 0.715 | 0.708 | **0.252** | — |
-| health | majority | 0.559 | 0.239 | — | — |
-| health | vader | 0.485 | 0.350 | — | **0.416** |
+| **tfidf13_svm** | discriminative | 0.8033 | **0.8058** | 14.1% | 71.8% |
+| tfidf13_lr | discriminative | 0.8007 | 0.8007 | 14.5% | 70.6% |
+| tfidf12_svm | discriminative | 0.8016 | 0.7993 | 14.5% | 69.5% |
+| tfidf11_lr | discriminative | 0.8074 | 0.7978 | 14.1% | 72.3% |
+| tfidf12_lr | discriminative | 0.8033 | 0.7939 | 16.1% | 73.5% |
+| tfidf11_svm | discriminative | 0.8038 | 0.7929 | 13.2% | 66.7% |
+| tfidf12_mnb | generative | 0.7570 | 0.7466 | 12.8% | 58.2% |
+| tfidf13_mnb | generative | 0.7473 | 0.7305 | 14.9% | 58.8% |
+| tfidf11_mnb | generative | 0.7326 | 0.7237 | 9.2% | 53.1% |
 
-The health rows are **provisional** — computed on the 0-neutral corpus and due to be
-re-run in Stage H-6. They are kept because the VADER health number is already the
-clearest single demonstration of the thesis: a general-purpose lexicon calls **41.6%**
-of genuinely positive drug reviews negative.
+**Best: `tfidf13_svm`** at 0.8058 (`C=1`, `class_weight="balanced"`) — **+0.098
+macro-F1 over the VADER baseline.**
 
-Note the two different failure directions. SE's is gold-neutral → negative; HEALTH's
-is gold-**positive** → negative. `evaluate()` reports both columns for every model.
+### Proposal Outcome #2 — generative vs discriminative
 
----
+| | Mean val macro-F1 | Best |
+|---|---|---|
+| Discriminative (LR, SVM) | **0.7984** | 0.8058 |
+| Generative (Naive Bayes) | 0.7336 | 0.7466 |
 
-## ✅ SE GATE
+A gap of **0.065** — far beyond the ~0.016 noise floor, and consistent across
+all three feature sets. This one is answered cleanly.
 
-The HEALTH track does not open until every box is ticked.
+### Outcome #1 — the n-gram range barely matters
 
-- [x] `data/processed/se/clean.csv` in `id;text;polarity` form — 4,331 rows
-- [x] Inter-rater agreement ≥ 0.75 — Fleiss' κ = **0.759**
-- [x] Splits frozen and committed — 3,031 / 650 / 650, seed 42
-- [x] `clean_text.py` passing its test suite — 36 tests
-- [x] `evaluate.py` written; SE baselines recorded
-- [ ] **Environment matches `requirements.txt`; `pytest` collects cleanly**
-- [ ] `normalize.py` written and tested
-- [ ] **Normalization ablation run; project default chosen and recorded**
-- [ ] TF-IDF and embedding features built for SE
-- [ ] 21 SE models trained, tuned and saved
-- [ ] SE test evaluated **once**; error analysis tagged
-- [ ] LIME and SHAP run on the 20 agreed SE instances; both bias tables produced
-- [ ] SE stress set written, cross-annotated (κ recorded) and run
-- [ ] **The full SE pipeline reruns end-to-end from `clean.csv` with one command**
+`tfidf11_lr` (0.7978) versus `tfidf13_lr` (0.8007) is a difference of ~2
+validation documents. That is consistent with the Stage 4 finding: the technical
+compound phrases the n-grams were meant to capture **are not in this corpus**, so
+widening the window buys almost nothing.
 
-That last box is the real gate. The HEALTH track's entire cost advantage depends on
-the SE pipeline being *reproducible*, not merely *finished once*.
+### ⚠️ A trap in the failure metric
 
----
+`tfidf11_mnb` has the *lowest* neutral→negative rate at 9.2% — which looks like
+the least jargon-biased model. It is not. It finds only **53% of genuinely
+negative posts**, against 72% for the best model.
 
-## Finishing the health corpus (Stage H-2, background work)
+Its low rate is not restraint about jargon; it is reluctance to predict
+"negative" at all. A model that never says negative would score a perfect 0% on
+that metric and be worthless. **The two columns must always be reported
+together**, which is why `val_negative_recall` sits beside it in the table.
 
-Two hand-labelling jobs. They are the only HEALTH-track work sanctioned to start
-before the SE GATE, because they are human time that cannot be compressed later.
-Budget ~30 rows per person per day.
+### Sanity check on the saved model
 
-### 1. Neutral class — 835 rows
-
-```bash
-python -m src.extraction.build_health      # writes 1,200 pre-scored candidates
+```
+Kill the process before restarting the server.   → neutral  (0.85)
+How do I use this function?                      → neutral  (0.95)
+Thanks, this works great!                        → positive (0.99)
+This library is broken and the docs are useless. → negative (0.75)
+The build failed with a fatal error on line 42.  → negative (0.93)
 ```
 
-Open `data/processed/health/neutral_candidates.csv`, fill the empty `polarity` column
-with `negative` / `neutral` / `positive`, save it as
-`data/processed/health/neutral_labelled.csv`, then re-run `build_health`.
-
-Candidates are pre-scored on dosage, imperative and schedule signals, with any overt
-affect word disqualifying the row, which cuts the labelling work by about an order of
-magnitude. Rows rated 4–7 are offered first because the binning discards them anyway,
-so labelling them costs no other class any data. 1,343 candidates pass the prefilter.
-
-**Why 835 and not the 400 the plan originally budgeted.** Negative is capped at 591
-rows, so matching SE's 27.15% negative share caps the whole corpus at ~2,177 rows, and
-38.37% of that is 835. The 400 figure assumed a 4,000-row corpus the negative class
-cannot support. `balance()` computes this and logs it as
-`neutral_rows_needed_for_target` rather than silently dropping the class.
-
-### 2. Label validation — 100 rows
-
-Fill the `my_label` column in `data/processed/health/validation_sample.csv`, then:
-
-```bash
-python -m src.extraction.validate_health
-```
-
-**Label from the text alone.** The file carries `rating` and `rating_derived` columns
-for later diagnosis; reading them while labelling makes the agreement figure
-worthless.
-
-The scorer reports agreement and Cohen's κ for the current 1–3 / 8–10 binning **and**
-the stricter 1–2 / 9–10 fallback side by side, plus a breakdown of disagreements by
-rating and direction. If the current scheme falls below 80% agreement, the output
-tells you whether the fallback rescues it or whether to take the documented escape
-hatch (switch to the Drugs.com corpus, UCI id 462).
-
-### HEALTH GATE checklist
-
-- [x] Corpus in `id;text;polarity` form
-- [ ] ≥ 300 usable neutral health rows — **currently 0**
-- [ ] Rating-agreement ≥ 80% on the validation sample
-- [ ] Comparable size and class balance across the two corpora
-- [ ] Splits **regenerated** from the completed corpus and re-frozen
-- [ ] Health baselines re-run (the provisional rows overwritten)
-- [ ] 21 health models trained; LIME, SHAP, bias probe, stress test complete
-- [ ] **Smoke transfer shows degradation** — if it does not, it is a bug
+The trained model handles *"kill the process"* correctly where VADER does not.
+The last line is the interesting one — a factual bug report read as hostility.
+That is the failure Stage 6 exists to explain.
 
 ---
 
-## Known issues and open decisions
+## Final results
 
-**The environment is broken.** `.venv` has only `pandas` 3.0.6 installed against a
-pinned 2.2.3, and `tests/test_evaluate.py` cannot be collected. **Fix before Stage 3.**
+**Full write-up: [report/REPORT.md](report/REPORT.md)** · **Demo: [notebooks/demo.ipynb](notebooks/demo.ipynb)**
 
-**The 15-word filter fights the neutral class.** Stage H-2.2's minimum length removed
-776 rows including *"Take pill once a day"* and *"400 mg every morning, 200 mg early
-afternoon."* — exactly the absence-of-affect text the neutral class is built from. The
-threshold is left at 15 for all classes (no divergence). `--neutral-min-words 8`
-raises the candidate pool from 1,343 to 1,543, but buys those 200 neutrals at the cost
-of a length confound where the model can learn "short = neutral" instead of learning
-sentiment. `mean_words_per_class` is logged so the confound is measurable.
-**Undecided — this belongs in the report either way.**
+### Test set — 15 models, read once
 
-**Inter-annotator κ needs two people.** Working solo, only rating-agreement can be
-reported; `validate_health` says so rather than inventing a number. This is the
-project's main methodological weakness and must be stated plainly in Limitations,
-alongside the label-provenance asymmetry: SE labels are human-annotated by three
-raters with reported agreement, health labels are rating-derived plus hand-labelled
-neutrals.
+| Model | Representation | Kind | Test macro-F1 | neut→neg |
+|---|---|---|---|---|
+| **tfidf13_svm** | TF-IDF | discriminative | **0.8275** | 14.4% |
+| tfidf13_lr | TF-IDF | discriminative | 0.8233 | 14.8% |
+| tfidf12_lr | TF-IDF | discriminative | 0.8108 | 14.0% |
+| tfidf12_mnb | TF-IDF | generative | 0.7601 | 12.0% |
+| w2v_svm | Word2Vec | discriminative | 0.7059 | 11.6% |
+| glove_lr | GloVe | discriminative | 0.7054 | 17.2% |
+| glove_gnb | GloVe | generative | 0.5668 | 39.2% |
+| *VADER baseline* | — | — | *0.7079* | *25.2%* |
+| *majority baseline* | — | — | *0.1852* | — |
 
-**Health text is ~2× longer than SE text** (64.7 vs 29.97 mean words). Relevant to
-LIME/SHAP stability (Stage 6.5) and to Word2Vec quality.
+**Best: `tfidf13_svm`, 0.8275 — +0.12 macro-F1 over VADER.**
 
-**`data/processed/health/clean.csv` contains Druglib review text verbatim** (wording
-unchanged; only runs of whitespace are collapsed, so a row is one line), while
-`.gitignore` currently excludes only `data/raw/`. The Druglib licence is research-only
-with no redistribution. **Decide whether to exclude the processed health files from
-version control too — before the text enters the git history**, since removing it
-afterwards requires a history rewrite.
+### The three proposal outcomes
 
-**SE-first pushes cross-domain transfer to the final two weeks.** The mitigation is
-the smoke-transfer check in Stage H-5: run one throwaway SE→HEALTH prediction the
-moment the first health model is saved, so a structural problem surfaces in Week 7
-rather than Week 8.
+**#1 — which representation?** TF-IDF, decisively: best 0.8275 vs Word2Vec 0.7059 and
+GloVe 0.7054. The n-gram range barely matters, which follows from the corpus finding below.
+
+**#2 — generative vs discriminative?** Discriminative wins: **0.7694** mean vs **0.6792**,
+consistent across all five representations, McNemar *p* = 4.7e-9.
+
+**#3 — domain cues or general-language bias?** The bias is real and its size tracks how
+much general English the representation carries:
+
+| Representation | False-alarm rate on harsh-but-neutral sentences |
+|---|---|
+| VADER (general lexicon) | **70%** |
+| GloVe (general English) | **40%** |
+| Word2Vec (this corpus) | **28%** |
+| TF-IDF (this corpus) | **14%** |
+
+### ⚠️ The finding that shaped the project
+
+**Senti4SD contains almost none of the vocabulary this project is about.** Four independent
+analyses agree:
+
+| Stage | Evidence |
+|---|---|
+| 4.1 | `fatal error`, `kill the process`, `null pointer exception` — **0 occurrences** |
+| 4.2 | `fatal` 0×, `hang` 0×, `abort` 0×, `kill` 3× in 3,031 posts |
+| 6.5 | LIME: **no** lexicon word appears ≥3× in the neutral sample |
+| 6.6 | SHAP: the Domain Bias Score cannot be computed for the same reason |
+
+The corpus is StackOverflow *discussion*, not error output. So the central claim is
+demonstrated on a purpose-built 60-sentence stress set instead — where it holds clearly.
+
+### What LIME and SHAP found
+
+Both agree (Spearman **0.872** over 80 shared tokens) that the model keys on **first-person
+and affective language** — `afraid, hate, painful, extremely, me` — not on technical
+vocabulary. LIME stability across five seeds: mean Jaccard **0.907**.
+
+### The headline sentence
+
+> VADER calls **70%** of harsh-but-neutral SE sentences negative.
+> The best trained model calls **7.5%**, while still catching **75%** of real complaints.
 
 ---
 
-## Data licence
+## Out of scope
 
-The Druglib donors require research-only use, no redistribution, and citation. Raw
-Druglib files are git-ignored; `src/acquisition/download.py` is committed instead.
-Cite:
+Deliberately excluded, recorded so the reasoning is visible:
+
+| Excluded | Reason |
+|---|---|
+| Second domain (health / Druglib) | Not in the proposal; needs ~835 hand-labelled rows. Partial code and data remain in the repo but are unused. |
+| Cross-domain transfer | Depends on the second domain. |
+| BERT / transformers | Not in the proposal, which names three representation families. Recorded as Future Work. |
+| McNemar tests, LIME stability study | Beyond the proposal's commitments. |
+| CLI demo | The proposal says "Notebook/CLI" — one satisfies it. |
+
+---
+
+## Known issues
+
+- **Word2Vec quality is limited by corpus size** (3,031 training documents). The
+  proposal already lists this under Limitations. The nearest-neighbour table is
+  reported regardless — a weak domain model beating GloVe on `kill` is the point.
+- **Trigrams may be too sparse to help** at this corpus size. That is a finding,
+  not a failure.
+- **The stress set will be written by one person**, so it reflects one person's
+  intuitions about what counts as harsh-but-neutral. Stated in Limitations.
+- **LIME and SHAP are approximations** with known stability limits, as the
+  proposal acknowledges.
+
+---
+
+## Licence and citation
+
+Senti4SD: Calefato, F., Lanubile, F., Maiorano, F., & Novielli, N. (2018).
+Sentiment Polarity Detection for Software Development. *Empirical Software
+Engineering*, 23(3), 1352–1382.
+
+The repository also contains an unused partial corpus from the UCI Drug Reviews
+(Druglib.com, id 461) dataset, whose donors require research-only use, no
+redistribution, and citation. Raw files are git-ignored.
 
 > Gräßer, F., Kallumadi, S., Malberg, H., & Zaunseder, S. (2018). Aspect-Based
 > Sentiment Analysis of Drug Reviews Applying Cross-Domain and Cross-Data Learning.
 > *Proceedings of the 2018 International Conference on Digital Health*, 121–125.
-
-Senti4SD: Calefato, F., Lanubile, F., Maiorano, F., & Novielli, N. (2018). Sentiment
-Polarity Detection for Software Development. *Empirical Software Engineering*, 23(3),
-1352–1382.

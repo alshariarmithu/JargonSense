@@ -1,6 +1,7 @@
 import numpy as np
+import pandas as pd
 import pytest
-from src.evaluation.evaluate import evaluate, mcnemar_test
+from src.evaluation.evaluate import evaluate, mcnemar_test, append_to_results_table
 from src.extraction.clean_text import LABELS
 
 def test_evaluate_accuracy_macro():
@@ -31,7 +32,7 @@ def test_evaluate_accuracy_macro():
     # positive: precision = 1/1, recall = 1/2 -> f1 = 2 * 1 * (1/2) / (3/2) = 2/3 = 0.6667
     # macro_f1 = (0.6667 + 0.5 + 0.6667) / 3 = 1.8333 / 3 = 0.6111
     
-    metrics = evaluate("test_model", "se", y_true, y_pred, out_dir="results/metrics_test")
+    metrics = evaluate("test_model", "se", y_true, y_pred, out_dir="results/metrics_test", fig_dir="results/figures_test")
     
     assert np.isclose(metrics["accuracy"], 0.6)
     assert np.isclose(metrics["macro_f1"], (2/3 + 0.5 + 2/3)/3)
@@ -49,7 +50,7 @@ def test_se_neutral_to_negative_rate():
     # predicted negative for those: 2
     # fraction: 2/3
     
-    metrics = evaluate("test_se", "se", y_true, y_pred, out_dir="results/metrics_test")
+    metrics = evaluate("test_se", "se", y_true, y_pred, out_dir="results/metrics_test", fig_dir="results/figures_test")
     assert np.isclose(metrics["se_neutral_to_negative_rate"], 2/3)
     assert metrics["health_positive_to_negative_rate"] == 0.0
 
@@ -61,8 +62,36 @@ def test_health_positive_to_negative_rate():
     # predicted negative: 3
     # fraction: 3/4 = 0.75
     
-    metrics = evaluate("test_health", "health", y_true, y_pred, out_dir="results/metrics_test")
+    metrics = evaluate("test_health", "health", y_true, y_pred, out_dir="results/metrics_test", fig_dir="results/figures_test")
     assert np.isclose(metrics["health_positive_to_negative_rate"], 0.75)
+
+def test_results_table_replaces_rather_than_duplicates(tmp_path):
+    """Re-running an experiment must update its row, not add a second one.
+
+    Without this, every re-run leaves a stale copy behind and the master
+    results table silently fills with contradictory duplicates.
+    """
+    # An absolute path overrides the module's ROOT-relative default.
+    table = tmp_path / "all_results.csv"
+    relative = str(table)
+
+    y_true = ["positive", "negative"]
+    first = evaluate("m", "se", y_true, ["positive", "negative"],
+                     out_dir="results/metrics_test", fig_dir="results/figures_test")
+    second = evaluate("m", "se", y_true, ["negative", "negative"],
+                      out_dir="results/metrics_test", fig_dir="results/figures_test")
+
+    append_to_results_table("other", "se", first, table_path=relative)
+    append_to_results_table("m", "se", first, table_path=relative)
+    append_to_results_table("m", "se", second, table_path=relative)
+
+    written = pd.read_csv(table)
+    assert len(written) == 2, "re-running a model must not add a second row"
+    # The row keeps its original position...
+    assert written["model_name"].tolist() == ["other", "m"]
+    # ...and holds the newest numbers, not the first ones.
+    assert np.isclose(written.loc[1, "accuracy"], second["accuracy"])
+
 
 def test_mcnemar_identical():
     # Identical predictions should have p-value ~1.0

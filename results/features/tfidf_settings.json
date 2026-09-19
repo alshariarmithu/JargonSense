@@ -1,0 +1,14 @@
+{
+  "tfidf11": {
+    "min_df": 5,
+    "max_features": null
+  },
+  "tfidf12": {
+    "min_df": 5,
+    "max_features": null
+  },
+  "tfidf13": {
+    "min_df": 2,
+    "max_features": null
+  }
+}

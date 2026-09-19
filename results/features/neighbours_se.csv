@@ -1,0 +1,15 @@
+word,embedding,train_occurrences,neighbours
+kill,glove,3,"killing, kills, destroy, shoot, attack, killed, dead, poison, them, suicide"
+kill,w2v,3,"activities, clarify, song, chain, deliver, exec, automation, forgetting, mssql, periodically"
+fatal,glove,0,"deadly, accidental, accident, deaths, accidents, poisoning, causing, caused, crash, cause"
+fatal,w2v,0,(out of vocabulary)
+crash,glove,9,"accident, crashes, crashed, plane, collision, airplane, flight, wreckage, pilot, explosion"
+crash,w2v,9,"bus, modifying, press, broadcast, choke, gc, pressing, confirmation, music, disk"
+error,glove,65,"errors, mistake, correct, incorrect, fault, difference, mistakes, calculation, probability, point"
+error,w2v,65,"occurs, assertion, hopeless, failed, messages, failure, throws, locally, exception, iphone"
+exception,glove,12,"exceptions, except, instance, example, only, though, although, given, same, reasons"
+exception,w2v,12,"damn, typical, expert, weird, onchange, tempted, whats, scared, practice, tdd"
+hang,glove,0,"seng, hung, shed, composite, down, index, kong, hong, indices, hanging"
+hang,w2v,0,(out of vocabulary)
+abort,glove,0,"aborted, aborting, takeoff, fetuses, aborts, eject, take-off, stillborn, conceive, fetus"
+abort,w2v,0,(out of vocabulary)

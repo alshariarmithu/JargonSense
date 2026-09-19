@@ -1,0 +1,61 @@
+id,text,intended_label,lexicon_word,pair_id,has_jargon,predicted,correct
+s01,Kill the process before restarting the server.,neutral,kill,1.0,True,neutral,True
+s02,"I had to kill the process three times and it still would not die, this scheduler is useless.",negative,kill,1.0,True,negative,True
+s03,The build failed with a fatal error on line 42.,neutral,fatal,2.0,True,neutral,True
+s04,Every build fails with a fatal error and nobody on the team can tell me why anymore.,negative,fatal,2.0,True,negative,True
+s05,The application crashed after the last update.,neutral,crash,3.0,True,neutral,True
+s06,"The application crashed again after the update, this release is a complete disaster.",negative,crash,3.0,True,neutral,False
+s07,Garbage collection destroys unused objects automatically.,neutral,destroy,4.0,True,neutral,True
+s08,"This framework destroys my productivity, I spend more time fighting it than writing code.",negative,destroy,4.0,True,negative,True
+s09,The thread will hang if you forget to release the lock.,neutral,hang,5.0,True,neutral,True
+s10,It hangs constantly and I have wasted two days on this rubbish library.,negative,hang,5.0,True,negative,True
+s11,Catch the exception and log the stack trace.,neutral,exception,6.0,True,neutral,True
+s12,"It throws an exception on every other call, the error handling here is hopeless.",negative,exception,6.0,True,negative,True
+s13,The pointer was corrupt after the memcpy call.,neutral,corrupt,7.0,True,neutral,True
+s14,"It corrupted my entire database and there was no warning at all, terrible design.",negative,corrupt,7.0,True,negative,True
+s15,A deadlock occurs when two threads wait on each other.,neutral,deadlock,8.0,True,neutral,True
+s16,"Random deadlocks every few hours and no way to debug them, I am giving up on this.",negative,deadlock,8.0,True,negative,True
+s17,Abort the transaction if the checksum does not match.,neutral,abort,9.0,True,neutral,True
+s18,"I had to abort the migration halfway through and now everything is broken, what a mess.",negative,abort,9.0,True,negative,True
+s19,The parser is stuck in an infinite loop on malformed input.,neutral,stuck,10.0,True,neutral,True
+s20,"I am completely stuck, the documentation is useless and nobody answers on the forum.",negative,stuck,10.0,True,negative,True
+s21,This method is deprecated in version three.,neutral,deprecated,,True,neutral,True
+s22,The compiler emits a warning for unused variables.,neutral,warning,,True,neutral,True
+s23,The process was killed by the out of memory handler.,neutral,killed,,True,neutral,True
+s24,Terminate the connection once the handshake completes.,neutral,terminate,,True,neutral,True
+s25,Execute the query inside a transaction block.,neutral,execute,,True,neutral,True
+s26,A null pointer exception is thrown when the list is empty.,neutral,exception,,True,neutral,True
+s27,The unit test fails on Windows but passes on Linux.,neutral,fail,,True,neutral,True
+s28,Check the error log before filing a bug report.,neutral,error,,True,neutral,True
+s29,This bug only appears when the cache is cold.,neutral,bug,,True,neutral,True
+s30,"The link is dead, use the mirror instead.",neutral,dead,,True,neutral,True
+s31,A buffer overflow exploit was patched in this release.,neutral,exploit,,True,neutral,True
+s32,The attack surface is reduced when you disable remote login.,neutral,attack,,True,neutral,True
+s33,Is the socket blocked while waiting for the response?,neutral,blocked,,True,neutral,True
+s34,The garbage collector runs when the heap is nearly full.,neutral,garbage,,True,neutral,True
+s35,A panic in the kernel module will take down the host.,neutral,panic,,True,neutral,True
+s36,The failure rate increases under heavy concurrent load.,neutral,failure,,True,neutral,True
+s37,How do I recover from a broken pipe error on a socket?,neutral,broken,,True,neutral,True
+s38,The transaction was aborted because the lock timed out.,neutral,abort,,True,neutral,True
+s39,Fatal signals can be trapped with a custom handler.,neutral,fatal,,True,neutral,True
+s40,If the checksum fails the file is treated as corrupt.,neutral,corrupt,,True,neutral,True
+s41,Why does this crash only in release builds and never in debug?,neutral,crash,,True,negative,False
+s42,The daemon terminates cleanly when it receives SIGTERM.,neutral,terminate,,True,neutral,True
+s43,Killing the parent process also kills all of its children.,neutral,kill,,True,neutral,True
+s44,A failed assertion prints the line number and exits.,neutral,failed,,True,neutral,True
+s45,Deprecated APIs are removed after two major versions.,neutral,deprecated,,True,neutral,True
+s46,The error message tells you which column is missing.,neutral,error,,True,neutral,True
+s47,Threads blocked on IO do not consume CPU time.,neutral,blocked,,True,neutral,True
+s48,Memory leaks eventually destroy long running server performance.,neutral,destroy,,True,neutral,True
+s49,A hung request should time out after thirty seconds.,neutral,hang,,True,neutral,True
+s50,Set the abort flag to stop the batch job early.,neutral,abort,,True,neutral,True
+s51,I have never used a more frustrating piece of software in my life.,negative,,,False,negative,True
+s52,The documentation is worthless and the maintainers ignore every issue.,negative,,,False,neutral,False
+s53,Three hours wasted on something that should have taken five minutes.,negative,,,False,neutral,False
+s54,Whoever designed this API clearly never had to use it themselves.,negative,,,False,neutral,False
+s55,"I regret choosing this library for the project, it has been nothing but trouble.",negative,,,False,negative,True
+s56,The support forum is a wasteland and the paid tier is not much better.,negative,,,False,neutral,False
+s57,Absolutely awful experience from installation to deployment.,negative,,,False,neutral,False
+s58,This is the worst tooling I have had the misfortune of working with.,negative,,,False,negative,True
+s59,Nothing about this workflow makes any sense and I am tired of fighting it.,negative,,,False,negative,True
+s60,"I would not recommend this to anyone, it has been a miserable few weeks.",negative,,,False,negative,True

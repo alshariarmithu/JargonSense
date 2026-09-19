@@ -1,12 +1,24 @@
+"""Stage 1 -- fetch the raw corpora and the pretrained embeddings.
+
+Run from the repository root:
+
+    python -m src.acquisition.download
+
+Nothing here is committed.  Senti4SD is large, and the Druglib licence forbids
+redistribution, so this script is committed in place of the data.
+"""
+
+import pathlib
 import shutil
 import subprocess
-from pathlib import Path
 
-RAW = Path(__file__).resolve().parent / "raw"
-SE_DIR = RAW / "senti4sd"
-HEALTH_DIR = RAW / "druglib"
+from src.paths import RAW, RAW_SENTI4SD as SE_DIR, RAW_DRUGLIB as HEALTH_DIR
 
 SENTI4SD_REPO = "https://github.com/collab-uniba/Senti4SD.git"
+
+# gensim's name for glove.6B.100d -- the same 400k vectors trained on
+# Wikipedia + Gigaword, distributed in a form gensim can load directly.
+GLOVE_MODEL = "glove-wiki-gigaword-100"
 
 
 

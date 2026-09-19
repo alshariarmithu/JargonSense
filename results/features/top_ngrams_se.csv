@@ -1,0 +1,91 @@
+polarity,rank,ngram,distinctiveness,mean_tfidf_in_class,mean_tfidf_other_classes
+negative,1,EMO_NEG,0.01825,0.0183,5e-05
+negative,2,sad,0.01552,0.01566,0.00014
+negative,3,i,0.01387,0.04381,0.02994
+negative,4,hate,0.01303,0.01353,0.0005
+negative,5,horrible,0.0118,0.01197,0.00017
+negative,6,afraid,0.01032,0.0116,0.00128
+negative,7,not,0.0103,0.02718,0.01688
+negative,8,terrible,0.00966,0.0102,0.00054
+negative,9,is,0.00907,0.03366,0.02458
+negative,10,m,0.00901,0.01633,0.00732
+negative,11,that,0.00893,0.02681,0.01788
+negative,12,i m,0.00879,0.01608,0.00729
+negative,13,annoying,0.00872,0.00894,0.00022
+negative,14,but,0.00823,0.01895,0.01072
+negative,15,pain,0.00814,0.00941,0.00127
+negative,16,really,0.00792,0.01674,0.00882
+negative,17,sad EMO_NEG,0.00776,0.00776,0.0
+negative,18,i hate,0.00741,0.00741,0.0
+negative,19,m afraid,0.0074,0.00811,0.00071
+negative,20,a,0.00701,0.03289,0.02588
+negative,21,error,0.00595,0.00624,0.00029
+negative,22,it,0.00586,0.02968,0.02382
+negative,23,really hate,0.00585,0.00597,0.00011
+negative,24,of,0.00576,0.02346,0.0177
+negative,25,a pain,0.00572,0.00638,0.00066
+negative,26,that s,0.00569,0.00968,0.00399
+negative,27,am,0.0056,0.00933,0.00373
+negative,28,very,0.00551,0.01312,0.00761
+negative,29,painful,0.00551,0.00628,0.00078
+negative,30,can not,0.00535,0.00751,0.00216
+neutral,1,?,0.01878,0.03307,0.01429
+neutral,2,URL,0.01721,0.02057,0.00336
+neutral,3,you,0.00714,0.02984,0.0227
+neutral,4,use,0.00616,0.0144,0.00824
+neutral,5,how,0.00565,0.01382,0.00817
+neutral,6,what,0.00477,0.01393,0.00916
+neutral,7,see,0.00449,0.00912,0.00463
+neutral,8,the,0.00416,0.03793,0.03377
+neutral,9,you can,0.00415,0.009,0.00486
+neutral,10,about,0.00405,0.01038,0.00633
+neutral,11,are you,0.00404,0.00476,0.00072
+neutral,12,are,0.00395,0.01336,0.00941
+neutral,13,CODE,0.00392,0.01027,0.00635
+neutral,14,or,0.00389,0.01161,0.00772
+neutral,15,worry,0.00386,0.00516,0.0013
+neutral,16,worry about,0.00383,0.00454,0.0007
+neutral,17,does,0.00376,0.00968,0.00593
+neutral,18,can,0.00364,0.01617,0.01254
+neutral,19,in,0.00346,0.02208,0.01861
+neutral,20,do,0.00346,0.01637,0.01291
+neutral,21,why,0.0033,0.00726,0.00396
+neutral,22,see URL,0.0033,0.00362,0.00032
+neutral,23,if,0.00327,0.01388,0.01061
+neutral,24,can use,0.00317,0.00458,0.00141
+neutral,25,if you,0.00313,0.00799,0.00486
+neutral,26,not,0.00301,0.02153,0.01852
+neutral,27,should,0.00301,0.00823,0.00523
+neutral,28,do i,0.00293,0.00461,0.00168
+neutral,29,version,0.00288,0.00487,0.00199
+neutral,30,your,0.00277,0.01217,0.00939
+positive,1,!,0.05584,0.06983,0.01399
+positive,2,excellent,0.04412,0.0452,0.00108
+positive,3,thanks,0.02923,0.02939,0.00017
+positive,4,great,0.02747,0.02777,0.0003
+positive,5,EMO_POS,0.02339,0.02415,0.00077
+positive,6,excellent !,0.01526,0.01531,5e-05
+positive,7,thanks !,0.01432,0.01445,0.00013
+positive,8,awesome,0.01306,0.01331,0.00025
+positive,9,thank,0.01068,0.01068,0.0
+positive,10,thank you,0.01026,0.01026,0.0
+positive,11,good,0.01006,0.01078,0.00072
+positive,12,! thanks,0.00991,0.00995,4e-05
+positive,13,great !,0.00904,0.00904,0.0
+positive,14,hope,0.00882,0.00886,4e-05
+positive,15,an excellent,0.0086,0.00899,0.00039
+positive,16,! !,0.00807,0.01115,0.00309
+positive,17,for,0.00771,0.02389,0.01618
+positive,18,awesome !,0.0076,0.00765,5e-05
+positive,19,really great,0.00751,0.00757,5e-05
+positive,20,works,0.00749,0.01112,0.00362
+positive,21,! EMO_POS,0.00746,0.00751,5e-05
+positive,22,like,0.00742,0.00985,0.00243
+positive,23,! i,0.00738,0.00865,0.00126
+positive,24,no worries,0.00722,0.00775,0.00053
+positive,25,help,0.00707,0.00937,0.0023
+positive,26,worries,0.00688,0.00758,0.0007
+positive,27,thanks for,0.00665,0.00665,-0.0
+positive,28,would be,0.00653,0.00899,0.00246
+positive,29,answer,0.00623,0.01236,0.00612
+positive,30,luck,0.00613,0.00637,0.00024

@@ -1,0 +1,59 @@
+# SE jargon lexicon
+#
+# Words that read as hostile in general English but are routine technical
+# vocabulary in software engineering discussion.  Used in two places:
+#
+#   Stage 6.4  error analysis  -- tagging neutral posts predicted negative
+#   Stage 6.5  LIME/SHAP       -- mean attribution toward "negative" on
+#                                 gold-neutral posts, per lexicon word
+#
+# One word per line, lowercase.  Lines starting with # are comments.
+#
+# Note recorded during Stage 4: several of these are rare or absent in
+# Senti4SD (fatal 0x, hang 0x, abort 0x, kill 3x).  That is itself a finding,
+# and it is why the Stage 6.7 stress set is written by hand.
+
+fatal
+error
+errors
+kill
+killed
+kills
+crash
+crashed
+crashes
+abort
+aborted
+exception
+exceptions
+fail
+failed
+fails
+failure
+dead
+deadlock
+bug
+bugs
+broken
+break
+breaks
+hang
+hangs
+panic
+terminate
+terminated
+execute
+garbage
+deprecated
+warning
+warnings
+exploit
+attack
+destroy
+destroys
+corrupt
+corrupted
+fault
+faults
+stuck
+blocked
