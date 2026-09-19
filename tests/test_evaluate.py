@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-from src.evaluate import evaluate, mcnemar_test
-from src.preprocess import LABELS
+from src.evaluation.evaluate import evaluate, mcnemar_test
+from src.extraction.clean_text import LABELS
 
 def test_evaluate_accuracy_macro():
     y_true = ["positive", "positive", "negative", "neutral", "neutral"]

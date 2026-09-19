@@ -3,11 +3,11 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+from src.paths import ROOT
 sys.path.append(str(ROOT))
 
-from src.splits import load_splits
-from src.evaluate import evaluate, append_to_results_table
+from src.preprocessing.splits import load_splits
+from src.evaluation.evaluate import evaluate, append_to_results_table
 
 import nltk
 try:

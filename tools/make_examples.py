@@ -1,4 +1,4 @@
-"""Generate the preprocessing tables for the report (Task A2.3).
+"""Generate the Stage 2 clean-up tables for the report.
 
 Writes one markdown file holding, per domain, the full ordered rule table and
 ten before/after examples drawn from the cleaned corpus.  The rule table comes
@@ -15,9 +15,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.preprocess import DOMAINS, PLACEHOLDERS, SEED, describe_rules, preprocess
+from src.extraction.clean_text import DOMAINS, PLACEHOLDERS, SEED, describe_rules, clean
 
-ROOT = Path(__file__).resolve().parents[1]
+from src.paths import ROOT
 OUT = ROOT / "report/preprocess_examples.md"
 
 N_EXAMPLES = 10
@@ -35,7 +35,7 @@ def _cell(text: str) -> str:
 
 def _pick(df: pd.DataFrame, domain: str) -> pd.DataFrame:
     """Ten rows, weighted toward ones where the domain rules actually fire."""
-    out = df.assign(after=df["text"].map(lambda t: preprocess(t, domain)))
+    out = df.assign(after=df["text"].map(lambda t: clean(t, domain)))
     fires = out["after"].str.contains("|".join(PLACEHOLDERS), regex=True)
 
     interesting = out[fires].sample(
@@ -90,7 +90,7 @@ def main() -> None:
         if not clean.exists():
             lines += [
                 f"_`{clean.relative_to(ROOT)}` not found "
-                f"-- run `python -m src.build_{domain}` first._",
+                f"-- run `python -m src.extraction.build_{domain}` first._",
                 "",
             ]
             continue

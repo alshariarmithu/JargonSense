@@ -16,9 +16,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.preprocess import LABELS, SEED, collapse_whitespace, preprocess
+from src.extraction.clean_text import LABELS, SEED, collapse_whitespace, clean
 
-ROOT = Path(__file__).resolve().parents[1]
+from src.paths import ROOT
 RAW_DIR = ROOT / "data/raw/druglib"
 OUT_DIR = ROOT / "data/processed/health"
 SE_LOG = ROOT / "data/processed/se/build_log.json"
@@ -72,7 +72,7 @@ def load_raw() -> pd.DataFrame:
     parts = sorted(RAW_DIR.glob("druglib_*.csv"))
     if not parts:
         raise FileNotFoundError(
-            f"no druglib_*.csv in {RAW_DIR} -- run `python data/download.py` first."
+            f"no druglib_*.csv in {RAW_DIR} -- run `python -m src.acquisition.download` first."
         )
     df = pd.concat([pd.read_csv(p) for p in parts], ignore_index=True)
     return df.rename(columns={"reviewID": "id"})
@@ -173,7 +173,7 @@ def score_neutrality(df: pd.DataFrame) -> pd.DataFrame:
     Dosage, imperative and schedule signals count toward neutrality; any overt
     affect word or exclamation mark disqualifies the row outright.
     """
-    normalised = df["text"].map(lambda t: preprocess(t, "health"))
+    normalised = df["text"].map(lambda t: clean(t, "health"))
     return df.assign(
         score=normalised.str.contains("DOSE").astype(int)
         + normalised.str.contains(_IMPERATIVE).astype(int)

@@ -11,8 +11,8 @@ supplied.  Working alone there is no second annotator, so inter-annotator kappa
 is simply unavailable -- the script says so rather than inventing a number, and
 that gap belongs in the report's Limitations section.
 
-    python -m src.validate_health
-    python -m src.validate_health --annotator2 path/to/their_labels.csv
+    python -m src.extraction.validate_health
+    python -m src.extraction.validate_health --annotator2 path/to/their_labels.csv
 
 Input:  data/processed/health/validation_sample.csv with `my_label` filled in
 Output: data/processed/health/validation_log.json
@@ -26,9 +26,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.preprocess import LABELS
+from src.extraction.clean_text import LABELS
 
-ROOT = Path(__file__).resolve().parents[1]
+from src.paths import ROOT
 OUT_DIR = ROOT / "data/processed/health"
 SAMPLE = OUT_DIR / "validation_sample.csv"
 
@@ -75,7 +75,7 @@ def load_labels(path: Path, column: str) -> pd.DataFrame:
 def validate(annotator2: Path | None = None) -> dict:
     if not SAMPLE.exists():
         raise FileNotFoundError(
-            f"{SAMPLE} not found -- run `python -m src.build_health` first."
+            f"{SAMPLE} not found -- run `python -m src.extraction.build_health` first."
         )
 
     raw = pd.read_csv(SAMPLE, sep=";")

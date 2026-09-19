@@ -132,7 +132,7 @@ _POST_DOMAIN: list[Rule] = [
 # --------------------------------------------------------------------------
 # public API
 # --------------------------------------------------------------------------
-def preprocess(text, domain: str) -> str:
+def clean(text, domain: str) -> str:
     """Normalise one document.
 
     Parameters
@@ -180,9 +180,9 @@ def tokenize(text: str) -> list[str]:
     return _TOKEN_RE.findall(text or "")
 
 
-def preprocess_tokens(text, domain: str) -> list[str]:
-    """Convenience: ``tokenize(preprocess(text, domain))``."""
-    return tokenize(preprocess(text, domain))
+def clean_tokens(text, domain: str) -> list[str]:
+    """Convenience: ``tokenize(clean(text, domain))``."""
+    return tokenize(clean(text, domain))
 
 
 def describe_rules(domain: str) -> list[tuple[int, str, str, str, str]]:

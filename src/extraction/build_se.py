@@ -5,7 +5,7 @@ Reads the gold-standard workbook, standardises it to the project's
 the filter log, Fleiss' kappa over the three raters, and the class
 distribution that the health corpus is balanced against in build_health.py.
 
-    python -m src.build_se
+    python -m src.extraction.build_se
 
 Outputs
 -------
@@ -24,9 +24,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.preprocess import LABELS, collapse_whitespace
+from src.extraction.clean_text import LABELS, collapse_whitespace
 
-ROOT = Path(__file__).resolve().parents[1]
+from src.paths import ROOT
 XLSX = (
     ROOT
     / "data/raw/senti4sd/Senti4SD_GoldStandard_and_DSM"
@@ -70,7 +70,7 @@ def fleiss_kappa(ratings: pd.DataFrame) -> tuple[float, int]:
 def build() -> pd.DataFrame:
     if not XLSX.exists():
         raise FileNotFoundError(
-            f"{XLSX} not found -- run `python data/download.py` first."
+            f"{XLSX} not found -- run `python -m src.acquisition.download` first."
         )
 
     raw = pd.read_excel(XLSX, sheet_name=SHEET)

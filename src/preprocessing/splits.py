@@ -15,9 +15,9 @@ from pathlib import Path
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from src.preprocess import DOMAINS, LABELS, SEED
+from src.extraction.clean_text import DOMAINS, LABELS, SEED
 
-ROOT = Path(__file__).resolve().parents[1]
+from src.paths import ROOT
 
 def create_splits(domain: str) -> None:
     if domain not in DOMAINS:

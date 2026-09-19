@@ -7,14 +7,20 @@ from pathlib import Path
 from typing import Sequence
 import pandas as pd
 import numpy as np
+import matplotlib
+
+# This module only ever writes PNG files, so it must not try to open a GUI
+# window.  Without this, importing pyplot picks the interactive Tk backend and
+# crashes under pytest and on any machine without a display.
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import accuracy_score, classification_report, f1_score, confusion_matrix
 from statsmodels.stats.contingency_tables import mcnemar
 
-from src.preprocess import LABELS
+from src.extraction.clean_text import LABELS
 
-ROOT = Path(__file__).resolve().parents[1]
+from src.paths import ROOT
 
 def evaluate(name: str, domain: str, y_true: Sequence[str], y_pred: Sequence[str], out_dir: str = "results/metrics") -> dict:
     """
