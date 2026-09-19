@@ -8,6 +8,7 @@ import pytest
 from src.preprocess import (
     DOMAINS,
     TOKEN_PATTERN,
+    collapse_whitespace,
     describe_rules,
     preprocess,
     preprocess_tokens,
@@ -166,6 +167,32 @@ def test_token_pattern_is_the_one_the_tokenizer_uses():
 # --------------------------------------------------------------------------
 # report table
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# collapse_whitespace: used by the corpus builders before preprocess() runs
+# --------------------------------------------------------------------------
+def test_collapse_whitespace_removes_line_breaks_and_double_spaces():
+    # The two shapes Druglib reviews actually contain.
+    assert collapse_whitespace("a.  b\n\n\nc") == "a. b c"
+
+
+def test_collapse_whitespace_trims_the_ends():
+    assert collapse_whitespace("  \n padded \t ") == "padded"
+
+
+@pytest.mark.parametrize("empty", [None, float("nan"), ""])
+def test_collapse_whitespace_tolerates_missing_text(empty):
+    # Builders map it over a column that may hold NaN.
+    assert collapse_whitespace(empty) == ""
+
+
+@pytest.mark.parametrize("domain", DOMAINS)
+def test_collapse_whitespace_changes_no_token(domain):
+    # The point of doing it at build time: it must be a no-op on the output of
+    # preprocess(), which squeezes the same characters at step 9.
+    raw = "Stopped after  400 mg\n\nno relief :-(   really?!"
+    assert preprocess(collapse_whitespace(raw), domain) == preprocess(raw, domain)
+
+
 @pytest.mark.parametrize("domain", DOMAINS)
 def test_rule_table_is_complete_and_ordered(domain):
     rows = describe_rules(domain)

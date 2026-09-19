@@ -24,7 +24,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.preprocess import LABELS
+from src.preprocess import LABELS, collapse_whitespace
 
 ROOT = Path(__file__).resolve().parents[1]
 XLSX = (
@@ -90,7 +90,10 @@ def build() -> pd.DataFrame:
     log["fleiss_kappa_items"] = kappa_n
 
     df["id"] = df["id"].astype(str).str.strip()
-    df["text"] = df["text"].astype(str).str.strip()
+    # Same whitespace normalisation as build_health.py, so a stored row is one
+    # line in both corpora.  The Senti4SD export happens to be free of internal
+    # runs already; this keeps it that way if the export ever changes.
+    df["text"] = df["text"].map(collapse_whitespace)
     df["polarity"] = df["polarity"].astype(str).str.strip().str.lower()
 
     before = len(df)

@@ -1,35 +1,5 @@
-"""Build the HEALTH corpus from the UCI Druglib reviews (Task B1).
-
-Druglib gives ratings, not sentiment labels, so this script does four separate
-jobs and logs every one of them:
-
-  1. sets aside benefitsReview / sideEffectsReview as the bias probe (B1.1)
-  2. filters commentsReview, counting what each filter removed (B1.2)
-  3. bins ratings 1-3 -> negative and 8-10 -> positive, discarding 4-7 (B1.3)
-  4. prefilters neutral candidates for hand-labelling, and draws the
-     validation sample for the rating-agreement check (B1.4)
-
-Run it twice.  The first pass writes neutral_candidates.csv and
-validation_sample.csv for you to hand-label; the second pass folds
-neutral_labelled.csv back in and balances the corpus.
-
-    python -m src.build_health
-    python -m src.build_health --inspect              # show dropped rows
-    python -m src.build_health --neutral-min-words 8  # see note below
-
-Note on the minimum length and the neutral class
-------------------------------------------------
-B1.2 drops reviews under 15 words; B1.3 builds the neutral class from
-imperative/dosage text such as "Take pill once a day".  Those two requirements
-are in direct conflict -- the length filter removes most of the neutral
-material before it can be labelled.  The script therefore reports candidate
-counts at both thresholds and the mean length per class, so the trade-off is
-visible: lowering the threshold for neutral only buys neutrals at the cost of a
-length confound, where the model can learn "short == neutral" instead of
-learning sentiment.  Default is 15, i.e. no divergence between classes.
-
+"""
 Outputs
--------
 data/processed/health/clean.csv              id;text;polarity
 data/processed/health/bias_probe.csv         id;rating;benefits;side_effects
 data/processed/health/neutral_candidates.csv to hand-label -> neutral_labelled.csv
@@ -46,7 +16,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.preprocess import LABELS, SEED, preprocess
+from src.preprocess import LABELS, SEED, collapse_whitespace, preprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW_DIR = ROOT / "data/raw/druglib"
@@ -59,9 +29,7 @@ NEUTRAL_CANDIDATES = 1200
 VALIDATION_SAMPLE = 100
 GATE1_MIN_NEUTRAL = 300
 
-#: B1.3.  4-7 is discarded, never mapped to neutral: a mid rating means mixed
-#: feelings, while Senti4SD neutral means absence of affect.  Conflating them
-#: would teach the model to call emotionally intense text neutral.
+
 BANDS = {"negative": range(1, 4), "positive": range(8, 11)}
 
 _BOILERPLATE = re.compile(
@@ -97,9 +65,9 @@ _AFFECT = re.compile(
 )
 
 
-# --------------------------------------------------------------------------
+
 # loading
-# --------------------------------------------------------------------------
+
 def load_raw() -> pd.DataFrame:
     parts = sorted(RAW_DIR.glob("druglib_*.csv"))
     if not parts:
@@ -118,8 +86,15 @@ def write_bias_probe(df: pd.DataFrame) -> int:
     who liked the drug describing its side effects is a clean, hand-label-free
     measurement of lexical bias.
     """
-    probe = df[["id", "rating", "benefitsReview", "sideEffectsReview"]].rename(
-        columns={"benefitsReview": "benefits", "sideEffectsReview": "side_effects"}
+    probe = (
+        df[["id", "rating", "benefitsReview", "sideEffectsReview"]]
+        .rename(
+            columns={"benefitsReview": "benefits", "sideEffectsReview": "side_effects"}
+        )
+        .assign(
+            benefits=lambda d: d["benefits"].map(collapse_whitespace),
+            side_effects=lambda d: d["side_effects"].map(collapse_whitespace),
+        )
     )
     probe.to_csv(OUT_DIR / "bias_probe.csv", sep=";", index=False, encoding="utf-8")
     return len(probe)
@@ -139,7 +114,7 @@ def filter_comments(
     threshold.
     """
     df = df.rename(columns={TEXT_COL: "text"})
-    df["text"] = df["text"].fillna("").astype(str).str.strip()
+    df["text"] = df["text"].map(collapse_whitespace)
     lowered = df["text"].str.lower()
     df["n_words"] = df["text"].str.split().str.len()
 

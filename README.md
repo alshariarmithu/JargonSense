@@ -125,15 +125,15 @@ probe in Task B5.3.
 | boilerplate (`see above`, `none`, `thanks`) | 25 |
 | copy-pasted drug monograph | 24 |
 | under 15 words | 776 |
-| duplicate text | 60 |
-| **After filtering** | **3,262** |
+| duplicate text | 61 |
+| **After filtering** | **3,261** |
 
 Rating bands (1–3 negative, 8–10 positive, 4–7 discarded):
 
 | Band | Count |
 |---|---|
 | negative (1–3) | 591 |
-| positive (8–10) | 1,824 |
+| positive (8–10) | 1,823 |
 | discarded (4–7) | 847 |
 
 4–7 is **discarded, never mapped to neutral**. A mid rating means *mixed
@@ -142,7 +142,7 @@ train the model to call emotionally intense text neutral and would silently
 destroy every cross-domain comparison.
 
 Current `clean.csv` holds **1,341 rows** (591 negative, 750 positive, **0
-neutral**), mean 64.4 words — roughly twice the SE mean, which is worth noting
+neutral**), mean 64.7 words — roughly twice the SE mean, which is worth noting
 when comparing the two domains.
 
 ---
@@ -300,10 +300,12 @@ Limitations, alongside the label-provenance asymmetry: SE labels are
 human-annotated by three raters with reported agreement, health labels are
 rating-derived plus hand-labelled neutrals.
 
-**Health text is ~2× longer than SE text** (64.4 vs 29.97 mean words). Relevant
+**Health text is ~2× longer than SE text** (64.7 vs 29.97 mean words). Relevant
 to LIME/SHAP stability (Task A6.3) and to Word2Vec quality.
 
-**`data/processed/health/clean.csv` contains Druglib review text verbatim**,
+**`data/processed/health/clean.csv` contains Druglib review text verbatim**
+(wording unchanged; only runs of whitespace are collapsed, so a row is one
+line),
 while `.gitignore` currently excludes only `data/raw/`. The Druglib licence is
 research-only with no redistribution. **Decide whether to exclude the processed
 health files from version control too.**
