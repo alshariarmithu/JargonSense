@@ -1,0 +1,39 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Contributions}{2}{subsection.1.1}%
+\contentsline {section}{\numberline {2}Related Work}{3}{section.2}%
+\contentsline {section}{\numberline {3}System Architecture}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Pipeline Overview}{3}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Module Architecture}{4}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Data Acquisition}{4}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Corpus: Senti4SD Gold Standard}{4}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Corpus Statistics}{4}{subsection.4.2}%
+\contentsline {section}{\numberline {5}Text Extraction and Cleaning}{5}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Critical Order Decisions}{5}{subsection.5.1}%
+\contentsline {section}{\numberline {6}Preprocessing}{5}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Normalisation Modes}{5}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Normalisation Ablation}{6}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Data Splitting}{6}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Feature Engineering}{6}{section.7}%
+\contentsline {subsection}{\numberline {7.1}TF-IDF Representations}{6}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}The Compound-Phrase Finding}{7}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Embeddings}{7}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Model Building}{8}{section.8}%
+\contentsline {subsection}{\numberline {8.1}The Model Grid}{8}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Hyperparameter Tuning}{8}{subsection.8.2}%
+\contentsline {section}{\numberline {9}Evaluation and Results}{8}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Baselines}{8}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Test-Set Results}{9}{subsection.9.2}%
+\contentsline {subsection}{\numberline {9.3}Key Findings}{9}{subsection.9.3}%
+\contentsline {subsection}{\numberline {9.4}Error Analysis}{9}{subsection.9.4}%
+\contentsline {section}{\numberline {10}Explainability Analysis}{10}{section.10}%
+\contentsline {subsection}{\numberline {10.1}LIME Explanations}{10}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}SHAP Explanations}{10}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}LIME--SHAP Agreement}{10}{subsection.10.3}%
+\contentsline {subsection}{\numberline {10.4}Stability Analysis}{10}{subsection.10.4}%
+\contentsline {section}{\numberline {11}Stress Test --- The Central Result}{11}{section.11}%
+\contentsline {subsection}{\numberline {11.1}The Headline Result}{11}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Outcome \#3 --- Lexical Bias Tracks Pretraining}{11}{subsection.11.2}%
+\contentsline {section}{\numberline {12}Web Application}{12}{section.12}%
+\contentsline {section}{\numberline {13}Limitations}{12}{section.13}%
+\contentsline {section}{\numberline {14}Conclusion and Future Work}{12}{section.14}%
+\contentsline {subsection}{\numberline {14.1}Future Work}{13}{subsection.14.1}%
