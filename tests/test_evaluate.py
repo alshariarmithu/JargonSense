@@ -52,18 +52,6 @@ def test_se_neutral_to_negative_rate():
     
     metrics = evaluate("test_se", "se", y_true, y_pred, out_dir="results/metrics_test", fig_dir="results/figures_test")
     assert np.isclose(metrics["se_neutral_to_negative_rate"], 2/3)
-    assert metrics["health_positive_to_negative_rate"] == 0.0
-
-def test_health_positive_to_negative_rate():
-    # HEALTH confusion rate: fraction of gold-positive predicted negative
-    y_true = ["positive", "positive", "positive", "positive", "neutral"]
-    y_pred = ["negative", "negative", "negative", "positive", "positive"]
-    # gold-positive: 4
-    # predicted negative: 3
-    # fraction: 3/4 = 0.75
-    
-    metrics = evaluate("test_health", "health", y_true, y_pred, out_dir="results/metrics_test", fig_dir="results/figures_test")
-    assert np.isclose(metrics["health_positive_to_negative_rate"], 0.75)
 
 def test_results_table_replaces_rather_than_duplicates(tmp_path):
     """Re-running an experiment must update its row, not add a second one.

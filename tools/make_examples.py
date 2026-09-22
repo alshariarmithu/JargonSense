@@ -1,7 +1,7 @@
 """Generate the Stage 2 clean-up tables for the report.
 
-Writes one markdown file holding, per domain, the full ordered rule table and
-ten before/after examples drawn from the cleaned corpus.  The rule table comes
+Writes one markdown file holding the full ordered rule table and ten
+before/after examples drawn from the cleaned corpus.  The rule table comes
 from ``describe_rules()``, so the report cannot drift away from the code.
 
     python -m tools.make_examples
@@ -15,13 +15,13 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.extraction.clean_text import DOMAINS, PLACEHOLDERS, SEED, describe_rules, clean
+from src.extraction.clean_text import PLACEHOLDERS, SEED, describe_rules, clean
 
-from src.paths import ROOT
+from src.paths import ROOT, SE_DIR
 OUT = ROOT / "docs/report/preprocess_examples.md"
 
 N_EXAMPLES = 10
-N_WITH_PLACEHOLDER = 6  # of the ten, how many must exercise a domain rule
+N_WITH_PLACEHOLDER = 6  # of the ten, how many must exercise a placeholder rule
 MAX_CHARS = 170
 
 
@@ -33,9 +33,9 @@ def _cell(text: str) -> str:
     return text.replace("|", "\\|")
 
 
-def _pick(df: pd.DataFrame, domain: str) -> pd.DataFrame:
-    """Ten rows, weighted toward ones where the domain rules actually fire."""
-    out = df.assign(after=df["text"].map(lambda t: clean(t, domain)))
+def _pick(df: pd.DataFrame) -> pd.DataFrame:
+    """Ten rows, weighted toward ones where the placeholder rules actually fire."""
+    out = df.assign(after=df["text"].map(clean))
     fires = out["after"].str.contains("|".join(PLACEHOLDERS), regex=True)
 
     interesting = out[fires].sample(
@@ -61,12 +61,12 @@ def _code(value: str) -> str:
     return f"{fence}{pad}{escaped}{pad}{fence}"
 
 
-def _rule_table(domain: str) -> list[str]:
+def _rule_table() -> list[str]:
     lines = [
         "| # | scope | rule | pattern | replacement |",
         "|---|---|---|---|---|",
     ]
-    for step, scope, name, pattern, repl in describe_rules(domain):
+    for step, scope, name, pattern, repl in describe_rules():
         lines.append(
             f"| {step} | {scope} | {name} | {_code(pattern)} | {_code(repl)} |"
         )
@@ -81,22 +81,20 @@ def main() -> None:
         "",
     ]
 
-    for domain in DOMAINS:
-        clean = ROOT / f"data/processed/{domain}/clean.csv"
-        lines += [f"## Domain: `{domain}`", "", "### Rules, in application order", ""]
-        lines += _rule_table(domain)
-        lines += ["", "### Before / after", ""]
+    clean_csv = SE_DIR / "clean.csv"
+    lines += ["### Rules, in application order", ""]
+    lines += _rule_table()
+    lines += ["", "### Before / after", ""]
 
-        if not clean.exists():
-            lines += [
-                f"_`{clean.relative_to(ROOT)}` not found "
-                f"-- run `python -m src.extraction.build_{domain}` first._",
-                "",
-            ]
-            continue
-
-        df = pd.read_csv(clean, sep=";")
-        picked = _pick(df, domain)
+    if not clean_csv.exists():
+        lines += [
+            f"_`{clean_csv.relative_to(ROOT)}` not found "
+            f"-- run `python -m src.extraction.build_se` first._",
+            "",
+        ]
+    else:
+        df = pd.read_csv(clean_csv, sep=";")
+        picked = _pick(df)
         lines += ["| id | before | after |", "|---|---|---|"]
         lines += [
             f"| {row.id} | {_cell(row.text)} | {_cell(row.after)} |"

@@ -56,6 +56,5 @@
       0.90625
     ]
   ],
-  "se_neutral_to_negative_rate": 0.144,
-  "health_positive_to_negative_rate": 0.017857142857142856
+  "se_neutral_to_negative_rate": 0.144
 }

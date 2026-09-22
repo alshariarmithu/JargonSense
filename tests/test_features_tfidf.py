@@ -36,7 +36,3 @@ def test_tuned_settings_fall_back_to_defaults(tmp_path, monkeypatch):
     monkeypatch.setattr(features, "TUNED_SETTINGS_FILE", tmp_path / "absent.json")
     assert features.load_tuned_settings() == features.DEFAULT_SETTINGS
 
-
-def test_non_se_domain_is_rejected():
-    with pytest.raises(ValueError, match="only the 'se' domain"):
-        features.build_vectorizer(domain="health")

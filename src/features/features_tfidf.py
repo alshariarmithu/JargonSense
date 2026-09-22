@@ -34,17 +34,13 @@ def load_tuned_settings() -> dict:
     return {**DEFAULT_SETTINGS, **settings.get(CONFIG, settings)}
 
 
-def build_vectorizer(
-    domain: str = "se", mode: str | None = None, **overrides
-) -> TfidfVectorizer:
+def build_vectorizer(mode: str | None = None, **overrides) -> TfidfVectorizer:
     """Build the `(1,3)` TF-IDF vectorizer used by the final model."""
-    if domain != "se":
-        raise ValueError("the retained pipeline supports only the 'se' domain")
     if mode is None:
         mode = load_chosen_mode()
     settings = {**load_tuned_settings(), **overrides}
     return TfidfVectorizer(
-        preprocessor=partial(prepare, domain=domain, mode=mode),
+        preprocessor=partial(prepare, mode=mode),
         token_pattern=TOKEN_PATTERN,
         ngram_range=NGRAM_RANGE,
         **settings,

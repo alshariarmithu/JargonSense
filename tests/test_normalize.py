@@ -171,18 +171,18 @@ def test_compare_modes_returns_every_mode():
 def test_prepare_applies_cleaning_then_normalisation():
     """One entry point, so a trained model and the demo see the same text."""
     raw = "Kill the PROCESS -- see <code>foo()</code> at http://example.com"
-    assert prepare(raw, domain="se", mode="none") == "kill the process see CODE at URL"
+    assert prepare(raw, mode="none") == "kill the process see CODE at URL"
 
 
 def test_prepare_normalisation_mode_is_applied():
     raw = "The server stopped responding"
-    assert "stop" in prepare(raw, domain="se", mode="lemma").split()
-    assert "stopped" in prepare(raw, domain="se", mode="none").split()
+    assert "stop" in prepare(raw, mode="lemma").split()
+    assert "stopped" in prepare(raw, mode="none").split()
 
 
 def test_prepare_handles_missing_input():
-    assert prepare(None, domain="se") == ""
-    assert prepare(float("nan"), domain="se") == ""
+    assert prepare(None) == ""
+    assert prepare(float("nan")) == ""
 
 
 def test_load_chosen_mode_returns_a_valid_mode():

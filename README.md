@@ -10,9 +10,9 @@ raw text -> SE cleaning -> TF-IDF (1,3) -> calibrated Linear SVM
 The retained model is `tfidf13_svm`. It accepts raw text and returns one of
 `negative`, `neutral`, or `positive`, with calibrated class probabilities.
 
-The health dataset and its construction/validation code are preserved as a
-separate research branch. This cleanup removes only discarded SE model
-alternatives and their generated outputs.
+The project targets this one corpus and this one pipeline. Alternative
+representations and classifiers were evaluated during model selection; only
+the retained pipeline is shipped here.
 
 ## Results
 
@@ -69,10 +69,10 @@ metrics for the retained pipeline.
 ## Layout
 
 ```text
-src/extraction/clean_text.py       shared SE/health cleaning
-src/extraction/build_health.py     preserved health dataset builder
-src/extraction/validate_health.py  preserved health label validation
-src/preprocessing/normalize.py     shared normalization utilities
+src/acquisition/download.py        fetch the Senti4SD corpus
+src/extraction/clean_text.py       SE text cleaning and placeholders
+src/extraction/build_se.py         gold standard -> clean.csv
+src/preprocessing/normalize.py     normalization and frozen splits
 src/features/features_tfidf.py     TF-IDF (1,3)
 src/modeling/models_tfidf.py       calibrated Linear SVM
 src/evaluation/                    metrics, LIME, SHAP, stress test

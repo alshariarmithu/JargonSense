@@ -250,7 +250,7 @@ def compare_modes(text) -> dict[str, str]:
 # --------------------------------------------------------------------------
 # Stage 2 + Stage 3, composed
 # --------------------------------------------------------------------------
-def prepare(text, domain: str = "se", mode: str = "none") -> str:
+def prepare(text, mode: str = "none") -> str:
     """Clean and normalise one raw document -- the full text pipeline.
 
     This is the single entry point every model uses, so that a model trained
@@ -258,10 +258,10 @@ def prepare(text, domain: str = "se", mode: str = "none") -> str:
     exactly the same transformations::
 
         from functools import partial
-        TfidfVectorizer(preprocessor=partial(prepare, domain="se", mode="lemma"),
+        TfidfVectorizer(preprocessor=partial(prepare, mode="lemma"),
                         token_pattern=TOKEN_PATTERN)
     """
-    return normalize(clean(text, domain), mode=mode)
+    return normalize(clean(text), mode=mode)
 
 
 def load_chosen_mode(default: str = "none") -> str:

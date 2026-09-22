@@ -48,21 +48,16 @@ def evaluate(name: str, domain: str, y_true: Sequence[str], y_pred: Sequence[str
     cm_counts = confusion_matrix(y_true, y_pred, labels=LABELS)
     cm_norm = confusion_matrix(y_true, y_pred, labels=LABELS, normalize='true')
     
-    # Calculate domain-specific confusion rates
+    # The confusion this project is about: harsh-but-neutral SE prose read as
+    # negative.  Reported alongside macro-F1 because a model can improve on the
+    # headline number while getting worse at exactly this.
     se_neutral_to_negative = 0.0
-    health_positive_to_negative = 0.0
-    
+
     if "neutral" in LABELS and "negative" in LABELS:
         neutral_idx = LABELS.index("neutral")
         negative_idx = LABELS.index("negative")
         if np.sum(cm_counts[neutral_idx, :]) > 0:
             se_neutral_to_negative = cm_norm[neutral_idx, negative_idx]
-            
-    if "positive" in LABELS and "negative" in LABELS:
-        positive_idx = LABELS.index("positive")
-        negative_idx = LABELS.index("negative")
-        if np.sum(cm_counts[positive_idx, :]) > 0:
-            health_positive_to_negative = cm_norm[positive_idx, negative_idx]
 
     metrics = {
         "accuracy": float(acc),
@@ -74,7 +69,6 @@ def evaluate(name: str, domain: str, y_true: Sequence[str], y_pred: Sequence[str
         "confusion_matrix_counts": cm_counts.tolist(),
         "confusion_matrix_normalized": cm_norm.tolist(),
         "se_neutral_to_negative_rate": float(se_neutral_to_negative),
-        "health_positive_to_negative_rate": float(health_positive_to_negative)
     }
     
     # Save to JSON
@@ -120,8 +114,7 @@ def append_to_results_table(name: str, domain: str, metrics: dict, table_path: s
             row[f"f1_{label}"] = metrics["per_class"][label]["f1-score"]
             
     row["se_neutral_to_negative_rate"] = metrics.get("se_neutral_to_negative_rate", 0.0)
-    row["health_positive_to_negative_rate"] = metrics.get("health_positive_to_negative_rate", 0.0)
-    
+
     df_row = pd.DataFrame([row])
 
     if file_path.exists():
@@ -181,7 +174,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Evaluate predictions against ground truth.")
     parser.add_argument("--name", required=True, help="Model name")
-    parser.add_argument("--domain", required=True, help="Domain (se or health)")
+    parser.add_argument("--domain", default="se", help="Corpus label used in output filenames")
     parser.add_argument("--true", required=True, help="Path to ground truth CSV (must contain 'polarity' column)")
     parser.add_argument("--pred", required=True, help="Path to predictions CSV (must contain 'prediction' column)")
     args = parser.parse_args()

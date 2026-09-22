@@ -20,11 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 RAW = DATA / "raw"
 RAW_SENTI4SD = RAW / "senti4sd"
-RAW_DRUGLIB = RAW / "druglib"
 
 PROCESSED = DATA / "processed"
 SE_DIR = PROCESSED / "se"
-HEALTH_DIR = PROCESSED / "health"
 
 STRESS_TEST = DATA / "stress_test"
 LEXICONS = DATA / "lexicons"
@@ -32,7 +30,6 @@ LEXICONS = DATA / "lexicons"
 # --------------------------------------------------------------- output data
 RESULTS = ROOT / "results"
 METRICS = RESULTS / "metrics"
-METRICS_TEST = RESULTS / "metrics_test"
 FIGURES = RESULTS / "figures"
 ABLATION = RESULTS / "ablation"
 FEATURES = RESULTS / "features"
@@ -40,12 +37,3 @@ EXPLANATIONS = RESULTS / "explanations"
 
 MODELS = ROOT / "models"
 REPORT = ROOT / "docs" / "report"
-
-
-def processed_dir(domain: str) -> Path:
-    """Return the processed-data folder for ``"se"`` or ``"health"``."""
-    if domain == "se":
-        return SE_DIR
-    if domain == "health":
-        return HEALTH_DIR
-    raise ValueError(f"domain must be 'se' or 'health', got {domain!r}")

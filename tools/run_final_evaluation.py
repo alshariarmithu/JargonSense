@@ -12,7 +12,7 @@ from src.preprocessing.splits import load_splits
 
 
 def main() -> None:
-    _, _, test_df = load_splits("se")
+    _, _, test_df = load_splits()
     model_path = MODELS / "se" / f"{MODEL_NAME}.joblib"
     if not model_path.exists():
         raise FileNotFoundError(

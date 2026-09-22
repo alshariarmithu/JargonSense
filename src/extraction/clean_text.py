@@ -4,13 +4,11 @@ import html
 import re
 from typing import NamedTuple
 
-DOMAINS = ("se", "health")
-
 LABELS = ["negative", "neutral", "positive"]
 
 SEED = 42
 
-PLACEHOLDERS = ("URL", "USER", "CODE", "DOSE", "NUM", "EMO_POS", "EMO_NEG")
+PLACEHOLDERS = ("URL", "USER", "CODE", "EMO_POS", "EMO_NEG")
 
 TOKEN_PATTERN = r"[A-Za-z_]+|\d+|[!?]"
 _TOKEN_RE = re.compile(TOKEN_PATTERN)
@@ -80,41 +78,22 @@ def _emoticon_rule(name: str, faces: list[str], repl: str) -> Rule:
 
 
 # rule tables
-# steps 3-4: run before the domain rules
-_PRE_DOMAIN: list[Rule] = [
+# steps 3-4: generic web noise, run before the code rules
+_PRE_CODE: list[Rule] = [
     _rule("urls -> URL", r"https?://\S+|www\.\S+", "URL"),
     _rule("mentions -> USER", r"@\w[\w.-]*", "USER"),
 ]
 
-# step 5: the only permitted divergence between domains
-_DOMAIN: dict[str, list[Rule]] = {
-    "se": [
-        _rule("code tags -> CODE", r"<code>.*?</code>", "CODE"),
-        _rule("backtick spans -> CODE", r"`+[^`]*`+", "CODE"),
-        _rule("calls foo(bar) -> CODE", r"\b\w[\w]*\([^()]*\)", "CODE"),
-        _rule("dotted paths a.b.c -> CODE", r"\b\w+(?:\.\w+){2,}\b", "CODE"),
-    ],
-    "health": [
-        _rule(
-            "dosage with unit -> DOSE",
-            r"\b\d+(?:[.,]\d+)?\s*"
-            r"(?:mgs?|mcg|ug|g|kg|ml|cc|l|iu|units?|tabs?|tablets?|pills?"
-            r"|capsules?|caps?|puffs?|drops?|sprays?|patch(?:es)?|%)\b",
-            "DOSE",
-        ),
-        _rule(
-            "fractional dose -> DOSE",
-            r"\b\d+\s*/\s*\d+\s*"
-            r"(?:packets?|tablets?|tabs?|pills?|cups?|teaspoons?|tsps?"
-            r"|tbsps?|doses?|patch(?:es)?)\b",
-            "DOSE",
-        ),
-        _rule("bare numbers -> NUM", r"\b\d+(?:[./,]\d+)*\b", "NUM"),
-    ],
-}
+# step 5: the StackOverflow-specific rules -- code spans become one CODE token
+_CODE: list[Rule] = [
+    _rule("code tags -> CODE", r"<code>.*?</code>", "CODE"),
+    _rule("backtick spans -> CODE", r"`+[^`]*`+", "CODE"),
+    _rule("calls foo(bar) -> CODE", r"\b\w[\w]*\([^()]*\)", "CODE"),
+    _rule("dotted paths a.b.c -> CODE", r"\b\w+(?:\.\w+){2,}\b", "CODE"),
+]
 
-# steps 6-9: run after the domain rules
-_POST_DOMAIN: list[Rule] = [
+# steps 6-9: run after the code rules
+_POST_CODE: list[Rule] = [
     _emoticon_rule("positive emoticons -> EMO_POS", _EMO_POS, "EMO_POS"),
     _emoticon_rule("negative emoticons -> EMO_NEG", _EMO_NEG, "EMO_NEG"),
     _rule("normalise apostrophes", r"[\u2018\u2019\u02bc\u00b4`]", "'"),
@@ -132,7 +111,7 @@ _POST_DOMAIN: list[Rule] = [
 # --------------------------------------------------------------------------
 # public API
 # --------------------------------------------------------------------------
-def clean(text, domain: str) -> str:
+def clean(text) -> str:
     """Normalise one document.
 
     Parameters
@@ -140,18 +119,12 @@ def clean(text, domain: str) -> str:
     text
         Raw document.  ``None`` and NaN are treated as the empty string, so the
         function is safe to hand straight to ``Series.apply``.
-    domain
-        ``"se"`` or ``"health"``.  Controls step 5 only; every other rule is
-        identical across domains.
 
     Returns
     -------
     str
         Lowercased text with placeholders in uppercase.
     """
-    if domain not in _DOMAIN:
-        raise ValueError(f"domain must be one of {DOMAINS}, got {domain!r}")
-
     if text is None or text != text:  # NaN is the only value unequal to itself
         return ""
 
@@ -164,7 +137,7 @@ def clean(text, domain: str) -> str:
         out = unescaped
     out = out.lower()
 
-    for rule in _PRE_DOMAIN + _DOMAIN[domain] + _POST_DOMAIN:
+    for rule in _PRE_CODE + _CODE + _POST_CODE:
         out = rule.apply(out)
 
     return out.strip()
@@ -180,29 +153,26 @@ def tokenize(text: str) -> list[str]:
     return _TOKEN_RE.findall(text or "")
 
 
-def clean_tokens(text, domain: str) -> list[str]:
-    """Convenience: ``tokenize(clean(text, domain))``."""
-    return tokenize(clean(text, domain))
+def clean_tokens(text) -> list[str]:
+    """Convenience: ``tokenize(clean(text))``."""
+    return tokenize(clean(text))
 
 
-def describe_rules(domain: str) -> list[tuple[int, str, str, str, str]]:
+def describe_rules() -> list[tuple[int, str, str, str, str]]:
     """Return the rule table as ``(step, scope, name, pattern, replacement)``.
 
     The report's preprocessing table is generated from this, so the
     documentation cannot drift away from the code.
     """
-    if domain not in _DOMAIN:
-        raise ValueError(f"domain must be one of {DOMAINS}, got {domain!r}")
-
     rows: list[tuple[int, str, str, str, str]] = [
-        (1, "shared", "html.unescape", "-", "-"),
-        (2, "shared", "lowercase", "-", "-"),
+        (1, "generic", "html.unescape", "-", "-"),
+        (2, "generic", "lowercase", "-", "-"),
     ]
     step = 3
     for scope, rules in (
-        ("shared", _PRE_DOMAIN),
-        (domain, _DOMAIN[domain]),
-        ("shared", _POST_DOMAIN),
+        ("generic", _PRE_CODE),
+        ("se", _CODE),
+        ("generic", _POST_CODE),
     ):
         for rule in rules:
             rows.append((step, scope, rule.name, rule.pattern.pattern, rule.repl))

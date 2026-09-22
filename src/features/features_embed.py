@@ -97,13 +97,13 @@ def load_glove() -> KeyedVectors:
     return _glove_cache
 
 
-def train_word2vec(texts, domain: str = "se", mode: str | None = None,
+def train_word2vec(texts, mode: str | None = None,
                    **overrides) -> KeyedVectors:
     """Train Word2Vec on one corpus and return just the vectors."""
     if mode is None:
         mode = load_chosen_mode()
 
-    sentences = [normalize_tokens(prepare(t, domain=domain, mode=mode), mode="none")
+    sentences = [normalize_tokens(prepare(t, mode=mode), mode="none")
                  for t in texts]
     settings = {**W2V_SETTINGS, **overrides}
     model = Word2Vec(sentences, **settings)
@@ -126,10 +126,9 @@ class MeanEmbeddingVectorizer(BaseEstimator, TransformerMixin):
         passed to ``fit()``.
     """
 
-    def __init__(self, embedding: str = "glove", domain: str = "se",
+    def __init__(self, embedding: str = "glove",
                  mode: str | None = None, vector_size: int = VECTOR_SIZE):
         self.embedding = embedding
-        self.domain = domain
         self.mode = mode
         self.vector_size = vector_size
 
@@ -146,8 +145,7 @@ class MeanEmbeddingVectorizer(BaseEstimator, TransformerMixin):
             # Trained here, inside fit, so cross-validation retrains per fold
             # and no test text ever reaches the vocabulary.
             self.vectors_ = train_word2vec(
-                X, domain=self.domain, mode=self.mode_,
-                vector_size=self.vector_size)
+                X, mode=self.mode_, vector_size=self.vector_size)
 
         self.vector_size_ = self.vectors_.vector_size
         return self
@@ -175,7 +173,7 @@ class MeanEmbeddingVectorizer(BaseEstimator, TransformerMixin):
 
     def _tokens(self, text) -> list[str]:
         return normalize_tokens(
-            prepare(text, domain=self.domain, mode=self.mode_), mode="none")
+            prepare(text, mode=self.mode_), mode="none")
 
     def transform(self, X) -> np.ndarray:
         matrix = np.zeros((len(X), self.vector_size_), dtype=np.float32)
@@ -248,7 +246,7 @@ def neighbour_table(vectors_by_name: dict, words=SE_PROBE_WORDS,
     return pd.DataFrame(rows)
 
 
-def search_word2vec_settings(train_df, val_df, domain: str = "se",
+def search_word2vec_settings(train_df, val_df,
                              mode: str | None = None) -> pd.DataFrame:
     """Try the Word2Vec settings the plan specifies, scored on validation.
 
@@ -264,11 +262,11 @@ def search_word2vec_settings(train_df, val_df, domain: str = "se",
     for vector_size in (50, 100):
         for sg in (0, 1):
             vectors = train_word2vec(
-                train_df["text"], domain=domain, mode=mode,
+                train_df["text"], mode=mode,
                 vector_size=vector_size, sg=sg)
 
             vectorizer = MeanEmbeddingVectorizer(
-                embedding="w2v", domain=domain, mode=mode,
+                embedding="w2v", mode=mode,
                 vector_size=vector_size)
             vectorizer.vectors_ = vectors
             vectorizer.vector_size_ = vectors.vector_size
@@ -312,12 +310,12 @@ def oov_report(vectorizers: dict, texts) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def build_vectorizer(embedding: str, domain: str = "se",
+def build_vectorizer(embedding: str,
                      mode: str | None = None) -> MeanEmbeddingVectorizer:
     """Factory matching ``features_tfidf.build_vectorizer``."""
     if embedding not in EMBEDDINGS:
         raise ValueError(f"embedding must be one of {EMBEDDINGS}, got {embedding!r}")
-    return MeanEmbeddingVectorizer(embedding=embedding, domain=domain, mode=mode)
+    return MeanEmbeddingVectorizer(embedding=embedding, mode=mode)
 
 
 # --------------------------------------------------------------------------
@@ -326,7 +324,7 @@ def build_vectorizer(embedding: str, domain: str = "se",
 def main() -> None:
     domain = "se"
     mode = load_chosen_mode()
-    train_df, _, _ = load_splits(domain)
+    train_df, _, _ = load_splits()
     FEATURES.mkdir(parents=True, exist_ok=True)
 
     print(f"Stage 4.2 -- embedding features on {domain.upper()}")
@@ -334,12 +332,12 @@ def main() -> None:
     print(f"  training on   : {len(train_df):,} documents\n")
 
     print("  loading pretrained GloVe ...", end="", flush=True)
-    glove_vec = build_vectorizer("glove", domain=domain, mode=mode)
+    glove_vec = build_vectorizer("glove", mode=mode)
     glove_vec.fit(train_df["text"])
     print(f" {len(glove_vec.vectors_):,} words, {glove_vec.vector_size_}d")
 
     print("  training Word2Vec on the training split ...", end="", flush=True)
-    w2v_vec = build_vectorizer("w2v", domain=domain, mode=mode)
+    w2v_vec = build_vectorizer("w2v", mode=mode)
     w2v_vec.fit(train_df["text"])
     print(f" {len(w2v_vec.vectors_):,} words, {w2v_vec.vector_size_}d")
 
@@ -407,8 +405,8 @@ def main() -> None:
 
     # ----------------------------------------------- Word2Vec settings search
     print("\nWord2Vec settings, judged by downstream validation macro-F1")
-    _, val_df, _ = load_splits(domain)
-    search = search_word2vec_settings(train_df, val_df, domain=domain, mode=mode)
+    _, val_df, _ = load_splits()
+    search = search_word2vec_settings(train_df, val_df, mode=mode)
     search.to_csv(FEATURES / f"w2v_search_{domain}.csv", index=False)
     best = search.loc[search["val_macro_f1"].idxmax()]
     spread = search["val_macro_f1"].max() - search["val_macro_f1"].min()

@@ -3,7 +3,7 @@
 Reads the gold-standard workbook, standardises it to the project's
 ``id;text;polarity`` contract, and reports the numbers the report needs:
 the filter log, Fleiss' kappa over the three raters, and the class
-distribution that the health corpus is balanced against in build_health.py.
+distribution.
 
     python -m src.extraction.build_se
 
@@ -90,9 +90,9 @@ def build() -> pd.DataFrame:
     log["fleiss_kappa_items"] = kappa_n
 
     df["id"] = df["id"].astype(str).str.strip()
-    # Same whitespace normalisation as build_health.py, so a stored row is one
-    # line in both corpora.  The Senti4SD export happens to be free of internal
-    # runs already; this keeps it that way if the export ever changes.
+    # Normalise whitespace so a stored row is exactly one line.  The Senti4SD
+    # export happens to be free of internal runs already; this keeps it that
+    # way if the export ever changes.
     df["text"] = df["text"].map(collapse_whitespace)
     df["polarity"] = df["polarity"].astype(str).str.strip().str.lower()
 

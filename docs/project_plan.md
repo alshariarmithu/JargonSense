@@ -526,7 +526,7 @@ reasoning is visible rather than looking like oversights.
 
 | Excluded | Reason |
 |---|---|
-| **Second domain (health / Druglib)** | Not in the proposal. Requires ~835 rows of hand-labelling, which is not feasible alongside the committed work. Code and partial corpus remain in the repository but are not used. |
+| **Second domain (health / Druglib)** | Not in the proposal. Requires ~835 rows of hand-labelling, which is not feasible alongside the committed work. Dropped entirely; the project targets Senti4SD only. |
 | **Cross-domain transfer experiments** | Depends on the second domain. |
 | **BERT / transformers** | Not in the proposal, which names exactly three representation families. Adding a fourth risks the central finding — a contextual model may fix the problem, which is a different project. Recorded as Future Work. |
 | **McNemar significance testing** | Useful but not committed to; 15 models make the ranking clear enough. |
@@ -570,10 +570,4 @@ Senti4SD: Calefato, F., Lanubile, F., Maiorano, F., & Novielli, N. (2018).
 Sentiment Polarity Detection for Software Development. *Empirical Software
 Engineering*, 23(3), 1352–1382.
 
-The repository also contains an unused partial corpus built from the UCI Drug
-Reviews (Druglib.com, id 461) dataset. Its donors require research-only use, no
-redistribution, and citation. Raw files are git-ignored.
-
-> Gräßer, F., Kallumadi, S., Malberg, H., & Zaunseder, S. (2018). Aspect-Based
-> Sentiment Analysis of Drug Reviews Applying Cross-Domain and Cross-Data Learning.
-> *Proceedings of the 2018 International Conference on Digital Health*, 121–125.
+Senti4SD is the only corpus this project uses.

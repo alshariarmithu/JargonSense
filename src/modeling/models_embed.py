@@ -102,10 +102,10 @@ def make_classifier(name: str):
     raise ValueError(f"unknown classifier {name!r}")
 
 
-def build_model(embedding: str, classifier: str, domain: str = "se",
+def build_model(embedding: str, classifier: str,
                 mode: str | None = None) -> Pipeline:
     """Vectoriser + optional scaler + classifier, accepting raw text."""
-    vectorizer = build_vectorizer(embedding, domain=domain, mode=mode)
+    vectorizer = build_vectorizer(embedding, mode=mode)
     steps, _ = make_classifier(classifier)
     return Pipeline([("embed", vectorizer), *steps])
 
@@ -116,7 +116,7 @@ def train_one(embedding: str, classifier: str, train_df, val_df,
     started = time.perf_counter()
 
     # Embed once.  Every parameter combination sees the same vectors.
-    vectorizer = build_vectorizer(embedding, domain=domain)
+    vectorizer = build_vectorizer(embedding)
     vectorizer.fit(train_df["text"])
     x_train = vectorizer.transform(train_df["text"])
 
@@ -136,7 +136,7 @@ def train_one(embedding: str, classifier: str, train_df, val_df,
         best_params, cv_score = {}, float("nan")
 
     # Refit as one complete raw-text pipeline, which is what gets saved.
-    model = build_model(embedding, classifier, domain=domain)
+    model = build_model(embedding, classifier)
     if best_params:
         model.set_params(**best_params)
     model.fit(train_df["text"], train_df["polarity"])
@@ -171,12 +171,12 @@ def train_one(embedding: str, classifier: str, train_df, val_df,
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--domain", default="se", choices=["se", "health"])
+    parser.add_argument("--domain", default="se", choices=["se"])
     parser.add_argument("--quick", action="store_true")
     args = parser.parse_args()
 
     domain = args.domain
-    train_df, val_df, _ = load_splits(domain)
+    train_df, val_df, _ = load_splits()
     MODEL_RESULTS.mkdir(parents=True, exist_ok=True)
 
     print(f"Stage 5.2 -- embedding models on {domain.upper()}")

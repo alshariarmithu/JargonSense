@@ -40,7 +40,7 @@ def fake_vectors() -> KeyedVectors:
 
 def vectorizer_with(vectors: KeyedVectors) -> MeanEmbeddingVectorizer:
     """A fitted vectoriser wrapping supplied vectors, skipping training."""
-    vectorizer = MeanEmbeddingVectorizer(embedding="w2v", domain="se", mode="none")
+    vectorizer = MeanEmbeddingVectorizer(embedding="w2v", mode="none")
     vectorizer.vectors_ = vectors
     vectorizer.vector_size_ = vectors.vector_size
     vectorizer.mode_ = "none"
@@ -115,19 +115,19 @@ def test_build_vectorizer_accepts_every_supported_embedding(embedding):
 # --------------------------------------------------------------------------
 def test_word2vec_trains_on_the_supplied_text_only():
     """Fitting inside fit() is what stops test vocabulary leaking in."""
-    vectors = train_word2vec(TEXTS, domain="se", mode="none", min_count=1, epochs=5)
+    vectors = train_word2vec(TEXTS, mode="none", min_count=1, epochs=5)
     assert "process" in vectors
     assert "nausea" not in vectors    # never appeared in TEXTS
 
 
 def test_word2vec_is_reproducible():
-    first = train_word2vec(TEXTS, domain="se", mode="none", min_count=1, epochs=5)
-    second = train_word2vec(TEXTS, domain="se", mode="none", min_count=1, epochs=5)
+    first = train_word2vec(TEXTS, mode="none", min_count=1, epochs=5)
+    second = train_word2vec(TEXTS, mode="none", min_count=1, epochs=5)
     assert np.allclose(first["process"], second["process"])
 
 
 def test_word2vec_respects_the_requested_dimension():
-    vectors = train_word2vec(TEXTS, domain="se", mode="none",
+    vectors = train_word2vec(TEXTS, mode="none",
                              min_count=1, epochs=5, vector_size=25)
     assert vectors.vector_size == 25
 
@@ -145,7 +145,7 @@ def test_oov_rate_counts_tokens_and_empty_documents():
 
 def test_corpus_counts_reports_zero_for_absent_words():
     """The diagnostic that explains why rare words get poor vectors."""
-    vectors = train_word2vec(TEXTS, domain="se", mode="none", min_count=1, epochs=5)
+    vectors = train_word2vec(TEXTS, mode="none", min_count=1, epochs=5)
     counts = corpus_counts(vectors, ["process", "abort"])
     assert counts["process"] > 0
     assert counts["abort"] == 0

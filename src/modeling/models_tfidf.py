@@ -24,6 +24,8 @@ from src.paths import MODELS
 from src.preprocessing.splits import load_splits
 
 MODEL_NAME = "tfidf13_svm"
+# Corpus label used in output filenames (results/metrics/se_*.json, models/se/).
+DOMAIN = "se"
 CV_FOLDS = 5
 SCORING = "f1_macro"
 PARAM_GRID = {
@@ -37,18 +39,18 @@ def make_classifier() -> CalibratedClassifierCV:
     return CalibratedClassifierCV(LinearSVC(random_state=SEED), cv=CV_FOLDS)
 
 
-def build_model(domain: str = "se", mode: str | None = None) -> Pipeline:
+def build_model(mode: str | None = None) -> Pipeline:
     """Build the complete raw-text prediction pipeline."""
     return Pipeline([
-        ("tfidf", build_vectorizer(domain=domain, mode=mode)),
+        ("tfidf", build_vectorizer(mode=mode)),
         ("clf", make_classifier()),
     ])
 
 
-def train(domain: str = "se", tune: bool = True) -> tuple[Pipeline, dict]:
+def train(tune: bool = True) -> tuple[Pipeline, dict]:
     """Train, validate, save, and return the retained pipeline."""
-    train_df, val_df, _ = load_splits(domain)
-    pipeline = build_model(domain=domain)
+    train_df, val_df, _ = load_splits()
+    pipeline = build_model()
     started = time.perf_counter()
 
     if tune:
@@ -72,13 +74,13 @@ def train(domain: str = "se", tune: bool = True) -> tuple[Pipeline, dict]:
 
     metrics = evaluate(
         f"{MODEL_NAME}_val",
-        domain,
+        DOMAIN,
         val_df["polarity"],
         model.predict(val_df["text"]),
         out_dir="results/models",
         fig_dir="results/models/figures",
     )
-    model_dir = MODELS / domain
+    model_dir = MODELS / DOMAIN
     model_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, model_dir / f"{MODEL_NAME}.joblib")
 

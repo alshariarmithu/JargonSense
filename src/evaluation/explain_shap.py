@@ -25,7 +25,7 @@ def main() -> None:
     parser.add_argument("--max-evals", type=int, default=300)
     args = parser.parse_args()
 
-    _, _, test_df = load_splits("se")
+    _, _, test_df = load_splits()
     model = joblib.load(MODELS / "se" / f"{MODEL_NAME}.joblib")
     chosen = choose_instances(
         test_df, model.predict(test_df["text"]), load_lexicon()

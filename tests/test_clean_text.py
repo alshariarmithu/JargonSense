@@ -6,7 +6,6 @@ Run from the repository root:  python -m pytest -q
 import pytest
 
 from src.extraction.clean_text import (
-    DOMAINS,
     TOKEN_PATTERN,
     collapse_whitespace,
     describe_rules,
@@ -17,28 +16,16 @@ from src.extraction.clean_text import (
 
 
 # --------------------------------------------------------------------------
-# the four sentences the work-division doc names explicitly
+# the sentences the work-division doc names explicitly
 # --------------------------------------------------------------------------
 def test_se_jargon_sentence_keeps_its_vocabulary():
     # "killed" must survive as "killed", not be stemmed to "kill".
-    assert clean("The process was killed", "se") == "the process was killed"
+    assert clean("The process was killed") == "the process was killed"
 
 
 def test_se_fatal_error_keeps_the_line_number():
-    # Numbers are only masked in the health domain.
-    assert clean("Fatal error on line 3", "se") == "fatal error on line 3"
-
-
-def test_health_relief_sentence_keeps_stopped():
-    assert clean("The nausea finally stopped", "health") == (
-        "the nausea finally stopped"
-    )
-
-
-def test_health_dosage_becomes_a_placeholder():
-    assert clean("I take 600mg three times a day", "health") == (
-        "i take DOSE three times a day"
-    )
+    # Digits are never masked: a line number is part of the error text.
+    assert clean("Fatal error on line 3") == "fatal error on line 3"
 
 
 # --------------------------------------------------------------------------
@@ -55,19 +42,19 @@ def test_health_dosage_becomes_a_placeholder():
     ],
 )
 def test_negation_contractions_expand(raw, expected):
-    assert clean(raw, "health") == expected
+    assert clean(raw) == expected
 
 
 def test_negation_words_are_never_removed():
-    out = clean("No more panic attacks since I started this", "health")
-    assert out.startswith("no more panic attacks")
+    out = clean("No more crashes since I upgraded")
+    assert out.startswith("no more crashes")
 
 
 def test_words_ending_in_nt_are_left_alone():
     # Regression: an optional apostrophe in the n't rule turned "want" into
-    # "wa not" and "treatment" into "treatme not".
-    assert clean("I want a different treatment", "health") == (
-        "i want a different treatment"
+    # "wa not" and "deployment" into "deployme not".
+    assert clean("I want a different deployment") == (
+        "i want a different deployment"
     )
 
 
@@ -76,7 +63,7 @@ def test_words_ending_in_nt_are_left_alone():
 # --------------------------------------------------------------------------
 def test_urls_are_replaced_before_emoticons():
     # "http://" contains ":/", a sad face.  Wrong order gives "httpEMO_NEG/...".
-    out = clean("see http://stackoverflow.com/q/1 for details", "se")
+    out = clean("see http://stackoverflow.com/q/1 for details")
     assert out == "see URL for details"
     assert "EMO_NEG" not in out
 
@@ -84,74 +71,62 @@ def test_urls_are_replaced_before_emoticons():
 def test_placeholders_stay_uppercase_and_distinct_from_real_words():
     # "url" and "user" occur as ordinary words in SE text; if lowercasing ran
     # after substitution the two would be indistinguishable.
-    out = clean("the user hit www.example.com", "se")
+    out = clean("the user hit www.example.com")
     assert out == "the user hit URL"
 
 
 def test_mentions_become_user():
-    assert clean("@talnicolas thanks", "se") == "USER thanks"
+    assert clean("@talnicolas thanks") == "USER thanks"
 
 
 # --------------------------------------------------------------------------
-# domain-specific rules fire only in their own domain
+# the code rules
 # --------------------------------------------------------------------------
-def test_code_spans_are_masked_only_in_se():
+def test_code_spans_are_masked():
     raw = "call foo(bar) and check org.apache.commons"
-    assert clean(raw, "se") == "call CODE and check CODE"
-    assert clean(raw, "health") == raw.lower()
+    assert clean(raw) == "call CODE and check CODE"
 
 
-def test_dose_and_num_are_masked_only_in_health():
-    raw = "1/4 packet twice a day for 3 weeks"
-    assert clean(raw, "health") == "DOSE twice a day for NUM weeks"
-    assert clean(raw, "se") == raw.lower()
+def test_digits_are_never_masked():
+    # There is no NUM rule: "1/4" and "3" are ordinary text in SE prose.
+    raw = "1/4 of the batch failed after 3 weeks"
+    assert clean(raw) == raw.lower()
 
 
 def test_single_dot_does_not_trigger_the_code_rule():
     # A missing space after a full stop must not be read as a dotted path.
-    assert clean("it crashed.the log says so", "se") == (
+    assert clean("it crashed.the log says so") == (
         "it crashed.the log says so"
     )
-
-
-def test_text_with_no_domain_pattern_is_identical_across_domains():
-    """Guards Section 3.3: preprocessing may not diverge without cause."""
-    raw = "This medication ruined my week and I am furious about it"
-    assert clean(raw, "se") == clean(raw, "health")
 
 
 # --------------------------------------------------------------------------
 # shared normalisation
 # --------------------------------------------------------------------------
 def test_html_entities_are_decoded_including_double_escaping():
-    assert clean("a &amp;lt; b", "se") == "a < b"
+    assert clean("a &amp;lt; b") == "a < b"
 
 
 def test_emoticons_become_polarity_tokens():
-    out = clean("works great :-) but slow :(", "se")
+    out = clean("works great :-) but slow :(")
     assert out == "works great EMO_POS but slow EMO_NEG"
 
 
 def test_repeated_characters_and_punctuation_collapse():
-    assert clean("sooooo bad!!!!", "health") == "soo bad!!"
+    assert clean("sooooo bad!!!!") == "soo bad!!"
 
 
 @pytest.mark.parametrize("bad", [None, float("nan"), "", "   \n\t  "])
 def test_empty_and_missing_input_give_the_empty_string(bad):
-    assert clean(bad, "se") == ""
-
-
-def test_unknown_domain_raises():
-    with pytest.raises(ValueError):
-        clean("anything", "finance")
+    assert clean(bad) == ""
 
 
 # --------------------------------------------------------------------------
 # tokeniser contract
 # --------------------------------------------------------------------------
 def test_tokenizer_keeps_punctuation_and_placeholder_tokens():
-    assert clean_tokens("Broken?! take 10 mg :-(", "health") == [
-        "broken", "?", "!", "take", "DOSE", "EMO_NEG",
+    assert clean_tokens("Broken?! call foo(bar) :-(") == [
+        "broken", "?", "!", "call", "CODE", "EMO_NEG",
     ]
 
 
@@ -160,18 +135,14 @@ def test_token_pattern_is_the_one_the_tokenizer_uses():
     # the constant and the function must not drift apart.
     import re
 
-    text = clean("kill the process! 42 times", "se")
+    text = clean("kill the process! 42 times")
     assert re.findall(TOKEN_PATTERN, text) == tokenize(text)
 
 
 # --------------------------------------------------------------------------
-# report table
-# --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
-# collapse_whitespace: used by the corpus builders before clean() runs
+# collapse_whitespace: used by the corpus builder before clean() runs
 # --------------------------------------------------------------------------
 def test_collapse_whitespace_removes_line_breaks_and_double_spaces():
-    # The two shapes Druglib reviews actually contain.
     assert collapse_whitespace("a.  b\n\n\nc") == "a. b c"
 
 
@@ -181,21 +152,22 @@ def test_collapse_whitespace_trims_the_ends():
 
 @pytest.mark.parametrize("empty", [None, float("nan"), ""])
 def test_collapse_whitespace_tolerates_missing_text(empty):
-    # Builders map it over a column that may hold NaN.
+    # The builder maps it over a column that may hold NaN.
     assert collapse_whitespace(empty) == ""
 
 
-@pytest.mark.parametrize("domain", DOMAINS)
-def test_collapse_whitespace_changes_no_token(domain):
+def test_collapse_whitespace_changes_no_token():
     # The point of doing it at build time: it must be a no-op on the output of
     # clean(), which squeezes the same characters at step 9.
-    raw = "Stopped after  400 mg\n\nno relief :-(   really?!"
-    assert clean(collapse_whitespace(raw), domain) == clean(raw, domain)
+    raw = "Crashed after  400 iterations\n\nno fix :-(   really?!"
+    assert clean(collapse_whitespace(raw)) == clean(raw)
 
 
-@pytest.mark.parametrize("domain", DOMAINS)
-def test_rule_table_is_complete_and_ordered(domain):
-    rows = describe_rules(domain)
+# --------------------------------------------------------------------------
+# report table
+# --------------------------------------------------------------------------
+def test_rule_table_is_complete_and_ordered():
+    rows = describe_rules()
     steps = [r[0] for r in rows]
     assert steps == list(range(1, len(rows) + 1))
-    assert any(scope == domain for _, scope, *_ in rows)
+    assert any(scope == "se" for _, scope, *_ in rows)

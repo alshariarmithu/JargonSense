@@ -183,7 +183,7 @@ def main() -> None:
     args = parser.parse_args()
 
     domain = args.domain
-    _, _, test_df = load_splits(domain)
+    _, _, test_df = load_splits()
     jargon = load_lexicon()
 
     model = joblib.load(MODELS / domain / f"{args.model}.joblib")

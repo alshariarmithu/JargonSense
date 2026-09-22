@@ -2,8 +2,7 @@
 
 Run from the repository root:
 
-    python -m tools.run_baselines                 # se (default)
-    python -m tools.run_baselines --domain health
+    python -m tools.run_baselines
 
 Two baselines, chosen because they fail in *different* ways:
 
@@ -44,7 +43,7 @@ NEGATIVE_CUTOFF = -0.05
 
 def run_majority(domain: str) -> dict:
     """Predict the most frequent training class for every test row."""
-    train_df, _, test_df = load_splits(domain)
+    train_df, _, test_df = load_splits()
 
     majority_class = train_df["polarity"].mode()[0]
     y_true = test_df["polarity"].tolist()
@@ -71,7 +70,7 @@ def vader_label(sia: SentimentIntensityAnalyzer, text: str) -> str:
 
 def run_vader(domain: str) -> dict:
     """Score the test split with the off-the-shelf VADER lexicon."""
-    _, _, test_df = load_splits(domain)
+    _, _, test_df = load_splits()
 
     sia = SentimentIntensityAnalyzer()
     y_true = test_df["polarity"].tolist()
@@ -86,19 +85,15 @@ def run_vader(domain: str) -> dict:
 
     # The headline number for this project: how often a model that knows
     # nothing about the domain mistakes domain vocabulary for hostility.
-    if domain == "se":
-        rate = metrics["se_neutral_to_negative_rate"]
-        print(f"[SE]   gold-neutral posts called negative: {rate:.1%}")
-    else:
-        rate = metrics["health_positive_to_negative_rate"]
-        print(f"[HEALTH]   gold-positive reviews called negative: {rate:.1%}")
+    rate = metrics["se_neutral_to_negative_rate"]
+    print(f"[SE]   gold-neutral posts called negative: {rate:.1%}")
     return metrics
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--domain", default="se", choices=["se", "health"],
-                        help="which corpus to score (default: se)")
+    parser.add_argument("--domain", default="se", choices=["se"],
+                        help="corpus label used in output filenames")
     args = parser.parse_args()
 
     run_majority(args.domain)
