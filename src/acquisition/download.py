@@ -1,11 +1,6 @@
-"""Stage 1 -- fetch the raw corpus and the pretrained embeddings.
-
-Run from the repository root:
-
+"""
+    Stage 1 -- fetch the raw corpus and the pretrained embeddings.
     python -m src.acquisition.download
-
-Nothing here is committed.  Senti4SD is large, so this script is committed in
-place of the data.
 """
 
 import pathlib

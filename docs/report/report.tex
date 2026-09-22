@@ -77,25 +77,33 @@
 % ── Title Page ──
 \begin{titlepage}
     \centering
-    \vspace*{1.5cm}
+    \vspace*{0.6cm}
 
-    {\Large \textsc{Khulna University of Engineering \& Technology}}\\[0.3cm]
-    {\large Department of Computer Science and Engineering}\\[2cm]
+    {\LARGE \textbf{Khulna University of Engineering \& Technology}}\\[1.0cm]
 
-    \rule{\textwidth}{1.2pt}\\[0.5cm]
-    {\LARGE \textbf{Interpretable Sentiment Classification in\\[0.3cm]
-    Software Engineering Communication}}\\[0.4cm]
-    \rule{\textwidth}{1.2pt}\\[1.5cm]
+    {\large \textbf{Department of Computer Science and Engineering}}\\[1.0cm]
 
-    {\large \textbf{Course:} CSE 4122 --- Natural Language Processing Lab}\\[1.8cm]
+    {\large \textbf{PROJECT REPORT}}\\[1.0cm]
 
-    \begin{tabular}{ll}
-        \textbf{Submitted by:} & \\[0.3cm]
-        Al Shariar Hossain       & Roll: 2107066 \\
-        Hassan Mohammed Naquibul Hoque & Roll: 2107077 \\
-    \end{tabular}\\[2.5cm]
+    {\large \textbf{Title: Interpretable Sentiment Classification in\\[0.25cm]
+    Software Engineering Communication}}\\[1.0cm]
 
-    {\large \today}
+    {\textbf{Course No:} CSE 4122}\\[0.25cm]
+    {\textbf{Course Title:} Natural Language Processing Laboratory}\\[0.25cm]
+    {\textbf{Submission Date:} 23 September, 2026}\\[0.9cm]
+
+    {\textbf{Submitted To:}}\\[0.7cm]
+
+    {\textbf{Dr. K. M. Azharul Hasan}}\\[0.15cm]
+    {Professor, Dept. of CSE, KUET}\\[0.6cm]
+
+    {\textbf{Md Nazirulhasan Shawon}}\\[0.15cm]
+    {Assistant Professor, Dept. of CSE, KUET}\\[1.1cm]
+
+    {\textbf{Submitted By:}}\\[0.4cm]
+
+    {Al Shariar Hossain (2107066)}\\[0.15cm]
+    {Hassan Mohammed Naquibul Hoque (2107077)}
 
     \vfill
 \end{titlepage}
@@ -251,7 +259,7 @@ Figure~\ref{fig:architecture} shows the modular organisation of the \texttt{src/
 
 \subsection{Corpus: Senti4SD Gold Standard}
 
-The primary dataset is the Senti4SD gold standard~\cite{calefato2018sentiment}, consisting of human-annotated StackOverflow posts labelled for sentiment polarity. The gold-standard workbook (\texttt{Senti4SD\_GoldStandard\_EmotionPolarity.xlsx}) is used rather than Senti4SD's pre-partitioned CSV files because it contains the individual rater columns (\texttt{r1}, \texttt{r2}, \texttt{r3}) required for computing inter-annotator agreement.
+The primary dataset is the Senti4SD gold standard~\cite{calefato2018sentiment}, consisting of human-annotated StackOverflow posts labelled for sentiment polarity. The gold-standard workbook (\texttt{Senti4SD\_\allowbreak GoldStandard\_\allowbreak EmotionPolarity.xlsx}) is used rather than Senti4SD's pre-partitioned CSV files because it contains the individual rater columns (\texttt{r1}, \texttt{r2}, \texttt{r3}) required for computing inter-annotator agreement.
 
 \subsection{Corpus Statistics}
 
@@ -322,7 +330,7 @@ Two ordering choices are load-bearing and merit explicit documentation:
 
 \textbf{Stopword removal is disabled permanently.} Negation words (\textit{not}, \textit{no}, \textit{never}) appear in every standard stopword list, and negation flips sentiment.
 
-\textbf{Implementation:} \texttt{src/extraction/clean\_text.py} (211 lines, 36 unit tests). The function \texttt{describe\_rules()} generates the rule table programmatically so the report documentation cannot drift from the code.
+\textbf{Implementation:} \texttt{src/extraction/clean\_text.py} (30 unit tests). The function \texttt{describe\_rules()} generates the rule table programmatically so the report documentation cannot drift from the code.
 
 % ======================================================================
 \section{Preprocessing}
@@ -382,7 +390,7 @@ Test & 650 \\
 
 Splits are frozen \textbf{before} any model is built. Every vectoriser, embedding, and scaler is fit on \textbf{train only}; fitting on anything else would leak the test set.
 
-\textbf{Implementation:} \texttt{src/preprocessing/normalize.py} (23 tests), \texttt{src/preprocessing/splits.py}.
+\textbf{Implementation:} \texttt{src/preprocessing/normalize.py} (29 tests), \texttt{src/preprocessing/splits.py}.
 
 % ======================================================================
 \section{Feature Engineering}
@@ -465,7 +473,7 @@ abort     & 0  & \textbf{aborted, fetuses} & \textit{OOV} \\
 
 GloVe places \textit{kill} beside \textit{shoot} and \textit{poison}, \textit{abort} beside \textit{fetuses}, \textit{crash} beside \textit{airplane}. \textbf{A general-English model reading StackOverflow genuinely sees violence and aviation disasters.} Word2Vec's neighbours are mostly noise due to low word frequencies, but \textit{error} (65$\times$) yields sensible domain neighbours, proving the mechanism works given sufficient data.
 
-\textbf{Implementation:} \texttt{src/features/features\_tfidf.py}, \texttt{src/features/features\_embed.py} (33 tests combined).
+\textbf{Implementation:} \texttt{src/features/features\_tfidf.py}, \texttt{src/features/features\_embed.py} (20 tests combined).
 
 % ======================================================================
 \section{Model Building}
@@ -513,7 +521,93 @@ All tuning is by \texttt{GridSearchCV} with stratified 5-fold cross-validation, 
 
 Every saved model is a \textbf{complete sklearn pipeline} taking raw strings and exposing both \texttt{predict()} and \texttt{predict\_proba()}, stored as \texttt{models/se/\{features\}\_\{classifier\}.joblib}.
 
-\textbf{Implementation:} \texttt{src/modeling/models\_tfidf.py}, \texttt{src/modeling/models\_embed.py} (19 tests).
+\textbf{Implementation:} \texttt{src/modeling/models\_tfidf.py}, \texttt{src/modeling/models\_embed.py}.
+
+\subsection{Why a Linear Model and Not a Transformer}
+\label{sec:whynotbert}
+
+A fine-tuned transformer such as BERT would almost certainly score higher than
+0.8275 macro-F1 on this corpus, and its absence from the model grid is a
+deliberate design decision rather than an oversight. The reason is that this
+project's deliverable is not a leaderboard number but an \textit{audit}: the
+research question asks \textit{which words} a model relies on, and that
+question is answerable exactly on a linear model and only approximately on a
+transformer. Table~\ref{tab:bertcompare} sets out the trade-off.
+
+\begin{table}[H]
+\centering
+\caption{Why explaining BERT is harder than explaining a linear SVM.}
+\label{tab:bertcompare}
+\footnotesize
+\renewcommand{\arraystretch}{1.35}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.6cm} X X}
+\toprule
+\textbf{Aspect} & \textbf{Linear SVM (what we have)} & \textbf{BERT (contextual transformer)} \\
+\midrule
+Explainability faithfulness
+& \textbf{Mathematically exact:} SHAP is closed-form for a linear model
+  ($\phi_i = w_i(x_i - \mathbb{E}[x_i])$). Zero approximation error.
+& \textbf{Approximation:} requires gradient paths or perturbation sampling
+  (LIME / Kernel SHAP); the explanation is itself a fitted model. \\
+
+Tokenisation
+& Whole words and $n$-grams; \textit{fatal error} is a single feature whose
+  weight can be read directly off the coefficient vector.
+& Subword pieces (e.g.\ \texttt{['kill', '\#\#ing']}); uncommon jargon is split
+  into fragments that must be re-aggregated before a word-level importance
+  even exists. \\
+
+Compute cost for explanations
+& SHAP values for the entire test set compute in \textbf{seconds} on a CPU.
+& LIME / SHAP need hundreds of forward passes \textit{per sentence}, taking
+  \textbf{hours} without a dedicated GPU. \\
+
+Masking artefacts
+& Not applicable --- removing a feature is exact, not simulated.
+& Masking words to test their importance creates out-of-distribution
+  sentences that the model was never trained to read, so the measured
+  importance partly reflects the masking, not the word. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Three consequences are specific to this project and decided the matter:
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{The exactness is load-bearing, not cosmetic.} The headline
+    explainability result of Section~\ref{sec:explainability} is the Spearman
+    agreement $\rho = 0.872$ between LIME and SHAP. That number is
+    interpretable only because SHAP is exact on a linear model: the
+    correlation measures LIME's sampling noise against a known ground truth.
+    On a transformer both sides would be approximations, and their agreement
+    would no longer distinguish ``the methods describe the model'' from ``the
+    methods share a sampling bias.''
+
+    \item \textbf{Subword tokenisation attacks the research question
+    directly.} The phenomenon under study is \textit{word-level} lexical
+    bias --- whether \textit{kill}, \textit{fatal}, and \textit{abort} are
+    read as hostility. WordPiece splits exactly this kind of low-frequency
+    jargon into fragments, so the quantity being measured would first have to
+    be reconstructed by a heuristic aggregation step that the linear model
+    does not need.
+
+    \item \textbf{The stress-test ladder is a controlled comparison.} The
+    central result of Section~\ref{sec:stress} --- false alarms falling
+    monotonically from VADER 70\% to GloVe 40\% to Word2Vec 28\% to TF-IDF
+    14\% --- works because each representation carries a \textit{known and
+    ordered} amount of general English. BERT is the natural next rung on that
+    same axis --- a measurement this ladder sets up rather than one it is
+    missing: adding it would extend the result, not invalidate it.
+\end{enumerate}
+
+\textbf{In summary.} \textit{Could} a transformer be used? Yes --- it is the
+ideal candidate for testing whether contextual attention eliminates the
+vocabulary bias this project measures. \textit{Why was it not used here?}
+Because a linear model gives a
+transparent, exact baseline on which vocabulary bias can be isolated
+mathematically, without the confounds of deep attention and expensive
+sampling-based approximation. Establishing that baseline is a precondition for
+interpreting what a transformer would later change.
 
 % ======================================================================
 \section{Evaluation and Results}
@@ -653,7 +747,7 @@ The Spearman rank correlation between LIME and SHAP token rankings is $\boldsymb
 
 Across five random seeds on the 20 fixed posts, the mean Jaccard overlap of the top-5 tokens is \textbf{0.907} (sd~0.164). High but not 1.0 --- individual explanations should be read as indicative, while aggregate tables provide the safer evidence.
 
-\textbf{Implementation:} \texttt{src/evaluation/explain\_lime.py} (266 lines), \texttt{src/evaluation/explain\_shap.py}.
+\textbf{Implementation:} \texttt{src/evaluation/explain\_lime.py}, \texttt{src/evaluation/explain\_shap.py}.
 
 % ======================================================================
 \section{Stress Test --- The Central Result}
@@ -727,18 +821,89 @@ TF-IDF (this corpus)         & \textbf{14\%} \\
 \label{sec:webapp}
 % ======================================================================
 
-A Flask-based web interface is provided for interactive exploration of the retained pipeline. The server loads the \texttt{tfidf13\_svm} model at startup and exposes the following endpoints:
+A Flask-based web interface, \textbf{JargonSense}, is provided for interactive
+exploration of the retained pipeline. The server loads the
+\texttt{tfidf13\_svm} model once at startup and exposes:
 
 \begin{itemize}[leftmargin=*]
-    \item \texttt{POST /api/predict} --- accepts raw text, returns the predicted label, class probabilities, and LIME token explanations with per-word highlighting.
-    \item \texttt{GET /api/results} --- returns the master results table.
-    \item \texttt{GET /api/stress} --- returns stress-test metrics and per-sentence predictions.
-    \item \texttt{GET /api/examples} --- provides 8 preloaded example sentences spanning SE jargon, genuine complaints, praise, and neutral questions.
+    \item \texttt{POST /api/predict} --- accepts raw text, returns the predicted label, class probabilities, and LIME token weights (400 samples).
+    \item \texttt{GET /api/examples} --- 16 preloaded example sentences, each carrying a short label, a group, and its \textit{expected} gold label.
+    \item \texttt{GET /api/models} --- the loaded model annotated with its test scores.
+    \item \texttt{GET /api/results}, \texttt{GET /api/stress} --- the master results table and the stress-test metrics. These are served for programmatic access; the page itself deliberately does not render them, so that the interface makes exactly one argument rather than restating the report.
 \end{itemize}
 
-The interface renders predictions with colour-coded token contributions (red for negative, green for positive, intensity proportional to weight), providing an immediate visual explanation of the model's reasoning.
+The page shows the predicted label, the three class probabilities, and the
+sentence with each token shaded by its LIME weight. \textbf{The shading encodes
+\textit{evidence for} versus \textit{evidence against the prediction}, not
+negative versus positive.} Red and green already denote the two sentiment
+classes everywhere else in the interface, so reusing them for token weights
+would invert their meaning whenever the prediction is itself negative ---
+a strongly negative-supporting token would be drawn in the colour of
+``positive''. Instead, tokens supporting the predicted class are drawn in the
+theme accent and tokens arguing against it in slate, with intensity
+proportional to $|w|$.
 
-\textbf{Implementation:} \texttt{app/server.py} (226 lines), launched via \texttt{python -m app.server}.
+Because each example declares its gold label, the interface reports whether
+the model \textit{agreed} with that label after every example click. This
+turns the demo into a claim that can fail in public rather than a showcase.
+
+\subsection{Held-Out Probe Sentences}
+\label{sec:probes}
+
+Eight of the sixteen examples are \textbf{held-out probes} written for this
+report. They appear in neither Senti4SD nor the stress set, and every jargon
+term in them occurs \textbf{zero times} in the 3,031 training documents:
+\textit{zombie}, \textit{reap}, \textit{poison}, \textit{watchdog},
+\textit{orphan}, \textit{panic}, \textit{abort}, \textit{deadlock},
+\textit{scheduler}. They therefore test the retained pipeline on vocabulary it
+has demonstrably never seen.
+
+\begin{table}[H]
+\centering
+\caption{Retained \texttt{tfidf13\_svm} pipeline on the eight held-out probe
+sentences. Probabilities are negative / neutral / positive.}
+\label{tab:probes}
+\footnotesize
+\begin{tabular}{lllcl}
+\toprule
+\textbf{Probe} & \textbf{Gold} & \textbf{Predicted} & \textbf{Probabilities} & \textbf{Verdict} \\
+\midrule
+zombie        & neutral  & neutral  & .04 / .95 / .00 & correct \\
+poison pill   & neutral  & neutral  & .26 / .73 / .01 & correct \\
+watchdog      & neutral  & neutral  & .14 / .82 / .04 & correct \\
+kernel panic  & neutral  & neutral  & .12 / .88 / .00 & correct \\
+abort $\cdot$ calm  & neutral  & neutral  & .05 / .83 / .12 & correct \\
+corruption    & negative & negative & .54 / .45 / .02 & correct \\
+abort $\cdot$ angry & negative & \textit{neutral} & .23 / .59 / .17 & \textbf{missed} \\
+praise        & positive & \textit{neutral} & .16 / .81 / .03 & \textbf{missed} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The result is a compact replication of the project's central finding.
+\textbf{All six harsh-but-neutral probes are classified neutral}, several with
+high confidence, despite being built entirely from words the model never
+encountered in training --- a TF-IDF model cannot inherit a hostile prior for a
+word it has no feature for, which is exactly the mechanism
+Section~\ref{sec:stress} measures.
+
+The two failures are equally informative, and they fail in the
+\textit{opposite} direction to the one the literature warns about. Neither is a
+false alarm on jargon; both are \textbf{missed genuine sentiment}. ``The
+service aborted my transaction again and lost two hours of work'' carries its
+negativity in \textit{again} and \textit{lost two hours}, and ``brilliant work
+on the lock ordering'' carries its praise in \textit{brilliant} (2 training
+occurrences). With the affective vocabulary too rare to have learned a strong
+weight, the surrounding technical prose pulls both sentences to neutral. This
+is the same weakness the test set records as 76.1\% negative recall
+(Table~\ref{tab:results}), and it is the concrete cost of a model whose
+vocabulary is confined to 3,031 StackOverflow posts --- precisely the deficit a
+pretrained contextual model would be expected to close
+(Section~\ref{sec:whynotbert}).
+
+\textbf{Implementation:} \texttt{app/server.py}, launched via
+\texttt{python -m app.server} (the port is probed upward from 8000 because
+Windows reserves blocks of low ports for Hyper-V).
 
 % ======================================================================
 \section{Limitations}
@@ -756,13 +921,13 @@ The interface renders predictions with colour-coded token contributions (red for
 
     \item \textbf{Single corpus, single domain.} Whether the failure mode generalises to other technical domains (e.g., DevOps, bioinformatics) is untested.
 
-    \item \textbf{No contextual models.} A fine-tuned transformer (e.g., BERT) might substantially reduce or eliminate the lexical bias measured here.
+    \item \textbf{No contextual models.} A fine-tuned transformer (e.g., BERT) might substantially reduce or eliminate the lexical bias measured here. This was a deliberate trade of accuracy for exact explainability, argued in full in Section~\ref{sec:whynotbert}; it remains a limitation regardless of the justification.
 
     \item \textbf{Annotation noise.} Fleiss' $\kappa = 0.759$ indicates good but not perfect agreement. Some ``errors'' are disagreements the annotators also had.
 \end{enumerate}
 
 % ======================================================================
-\section{Conclusion and Future Work}
+\section{Conclusion}
 \label{sec:conclusion}
 % ======================================================================
 
@@ -771,15 +936,6 @@ A tuned TF-IDF (1,3) + calibrated linear SVM reaches \textbf{0.8275 test macro-F
 The project's more significant contribution is methodological. The standard SE sentiment corpus does not contain the harsh technical vocabulary that motivates SE sentiment research, so the canonical claim cannot be tested on it --- a fact that four independent analyses surfaced. When tested on purpose-built sentences, the bias is unambiguous: its magnitude tracks exactly how much general English the representation carries, from 70\% false alarms for VADER down to 7.5\% for corpus-trained TF-IDF+SVM.
 
 LIME and SHAP confirm that the best model relies on first-person affective language rather than technical vocabulary, achieving a Spearman agreement of 0.872 between the two methods.
-
-\subsection{Future Work}
-
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Contextual models:} Evaluate a fine-tuned transformer (e.g., CodeBERT, BERTOverflow) to determine whether contextual embeddings eliminate the lexical bias or merely reduce it.
-    \item \textbf{Better corpus:} Build a corpus containing error-log vocabulary, drawn from bug trackers and CI/CD logs rather than discussion threads.
-    \item \textbf{Cross-annotation:} Extend the stress set with blind annotation by multiple annotators.
-    \item \textbf{Cross-domain replication:} Test whether the failure mode generalises to other technical domains such as DevOps, security, or bioinformatics.
-\end{enumerate}
 
 % ======================================================================
 \section*{Reproducibility}
@@ -790,14 +946,19 @@ Every number in this report is produced by a runnable script. The complete repro
 \begin{lstlisting}[language=bash]
 pip install -r requirements.txt
 python -m src.acquisition.download
-python -m src.extraction.build_se
-python -m src.preprocessing.splits --domain se
-python -m src.modeling.models_tfidf
-python -m tools.run_final_evaluation
-python -m src.evaluation.stress_test
-python -m src.evaluation.explain_lime
-python -m src.evaluation.explain_shap
-python -m pytest -q               # 123 tests
+python -m src.extraction.build_se               # corpus, Fleiss' kappa
+python -m src.preprocessing.splits --domain se  # frozen splits
+python -m tools.run_baselines --domain se       # majority, VADER
+python -m tools.run_ablation                    # normalisation ablation
+python -m src.features.features_tfidf           # TF-IDF vocabularies
+python -m src.features.features_embed           # GloVe + Word2Vec
+python -m src.modeling.models_tfidf             # 9 models
+python -m src.modeling.models_embed             # 6 models
+python -m tools.run_final_evaluation            # test-set results
+python -m src.evaluation.explain_lime           # LIME
+python -m src.evaluation.explain_shap           # SHAP
+python -m src.evaluation.stress_test            # stress set
+python -m pytest -q                             # 90 tests
 \end{lstlisting}
 
 The trained pipeline is saved to \texttt{models/se/tfidf13\_svm.joblib}. The web interface is launched via \texttt{python -m app.server}.

@@ -1,6 +1,14 @@
 # Interpretable Sentiment Classification in Software Engineering Communication
 
-**CSE 4122** · Al Shariar Hossain (Roll 2107066) · Hassan Mohammed Naquibul Hoque (Roll 2107077)
+**Khulna University of Engineering & Technology** · Department of Computer Science and Engineering
+
+**Course No:** CSE 4122 · **Course Title:** Natural Language Processing Laboratory ·
+**Submission Date:** 23 September, 2026
+
+**Submitted to:** Dr. K. M. Azharul Hasan (Professor, Dept. of CSE, KUET) ·
+Md Nazirulhasan Shawon (Assistant Professor, Dept. of CSE, KUET)
+
+**Submitted by:** Al Shariar Hossain (2107066) · Hassan Mohammed Naquibul Hoque (2107077)
 
 > Every number in this report is produced by a script in the repository and written to
 > `results/`. Nothing is typed by hand. The command that produces each table is named
@@ -255,6 +263,43 @@ Two constraints worth stating. `LinearSVC` has no `predict_proba`, so it is wrap
 generative model becomes `GaussianNB` there. That is a real consequence of choosing a dense
 representation, not a technicality.
 
+### 6.1 Why a linear model and not a transformer
+
+A fine-tuned BERT would almost certainly beat 0.8275 macro-F1 here. Its absence is a
+decision, not an oversight: the deliverable is an **audit** of *which words* the model
+relies on, and that question is answerable exactly on a linear model and only
+approximately on a transformer.
+
+| Aspect | Linear SVM (what we have) | BERT (contextual transformer) |
+|---|---|---|
+| Explainability faithfulness | **Mathematically exact** — SHAP is closed-form for a linear model (φᵢ = wᵢ(xᵢ − E[xᵢ])). Zero approximation error. | **Approximation** — requires gradient paths or perturbation sampling (LIME/SHAP); the explanation is itself a fitted model. |
+| Tokenisation | Whole words and n-grams; *fatal error* is one feature whose weight is read straight off the coefficient vector. | Subword pieces (`['kill', '##ing']`); uncommon jargon is split into fragments that must be re-aggregated before a word-level importance even exists. |
+| Compute cost for explanations | SHAP for the **entire test set** in seconds, on CPU. | Hundreds of forward passes **per sentence** — hours without a dedicated GPU. |
+| Masking artefacts | N/A — removing a feature is exact, not simulated. | Masking words creates out-of-distribution sentences the model never trained on, so the measured importance partly reflects the masking. |
+
+Three consequences are specific to this project and decided the matter:
+
+1. **The exactness is load-bearing.** Our headline explainability result is the Spearman
+   agreement ρ = 0.872 between LIME and SHAP (§8.2). That number means something *only*
+   because SHAP is exact on a linear model — it measures LIME's sampling noise against a
+   known ground truth. On a transformer both sides are approximations, and their agreement
+   could no longer distinguish "both describe the model" from "both share a sampling bias".
+2. **Subword tokenisation attacks the research question directly.** The phenomenon is
+   *word-level* lexical bias — whether *kill*, *fatal*, *abort* read as hostility. WordPiece
+   splits exactly this low-frequency jargon into fragments, so the quantity being measured
+   would first have to be rebuilt by a heuristic the linear model never needs.
+3. **The stress-test ladder is a controlled comparison.** §9's result — false alarms falling
+   from VADER 70% → GloVe 40% → Word2Vec 28% → TF-IDF 14% — works because each
+   representation carries a *known, ordered* amount of general English. BERT is the next
+   rung on that axis — a measurement this ladder sets up rather than one it is missing:
+   adding it would extend the result, not invalidate it.
+
+**In summary.** *Could* we use BERT? Yes — it is the ideal candidate for testing whether
+contextual attention eliminates the vocabulary bias measured here. *Why didn't we?*
+A linear model gave a transparent, exact baseline on which
+vocabulary bias can be isolated mathematically, without the confounds of deep attention and
+expensive sampling. That baseline is a precondition for interpreting what BERT would change.
+
 ---
 
 ## 7. Results
@@ -402,7 +447,55 @@ needs technical vocabulary to notice hostility at all.
 
 ---
 
-## 10. Limitations
+## 10. The demo, and eight held-out probes
+
+`python -m app.server` serves **JargonSense**, a Flask interface over the retained
+`tfidf13_svm` pipeline. It shows the predicted label, the three class probabilities, and the
+sentence shaded token-by-token by LIME weight.
+
+One detail is worth stating because it is easy to get wrong: **the shading encodes
+*evidence for* vs *evidence against the prediction*, not negative vs positive.** Red and
+green already mean the two sentiment classes everywhere else on the page, so reusing them
+for token weights would invert their meaning whenever the prediction is itself negative.
+Tokens supporting the predicted class are drawn in the accent, tokens arguing against it in
+slate. Each example also declares its gold label, so the page reports whether the model
+*agreed* — the demo can fail in public.
+
+### 10.1 Held-out probes
+
+Eight of the sixteen built-in examples are **held-out probes** written for this report. They
+appear in neither Senti4SD nor the stress set, and every jargon term in them occurs **zero
+times** in the 3,031 training documents — *zombie*, *reap*, *poison*, *watchdog*, *orphan*,
+*panic*, *abort*, *deadlock*, *scheduler*. They test the pipeline on vocabulary it
+demonstrably never saw.
+
+| Probe | Gold | Predicted | neg / neu / pos | |
+|---|---|---|---|---|
+| zombie | neutral | neutral | .04 / **.95** / .00 | ✓ |
+| poison pill | neutral | neutral | .26 / **.73** / .01 | ✓ |
+| watchdog | neutral | neutral | .14 / **.82** / .04 | ✓ |
+| kernel panic | neutral | neutral | .12 / **.88** / .00 | ✓ |
+| abort · calm | neutral | neutral | .05 / **.83** / .12 | ✓ |
+| corruption | negative | negative | **.54** / .45 / .02 | ✓ |
+| abort · angry | negative | *neutral* | .23 / .59 / .17 | ✗ |
+| praise | positive | *neutral* | .16 / .81 / .03 | ✗ |
+
+**All six harsh-but-neutral probes come back neutral**, several with high confidence, though
+they are built entirely from words the model has no feature for. That is the mechanism §9
+measures, restated: a TF-IDF model cannot inherit a hostile prior for a word it never saw.
+
+The two failures fail in the **opposite direction to the one the literature warns about**.
+Neither is a false alarm on jargon; both are *missed genuine sentiment*. "The service
+aborted my transaction **again** and **lost two hours of work**" carries its negativity in
+ordinary English, and "**brilliant** work on the lock ordering" carries its praise in a word
+with 2 training occurrences. With the affective vocabulary too rare to have earned a strong
+weight, the surrounding technical prose drags both to neutral. This is the same weakness the
+test set records as 76.1% negative recall — and it is exactly the deficit a pretrained
+contextual model would be expected to close (§6.1).
+
+---
+
+## 11. Limitations
 
 1. **The corpus does not contain the phenomenon.** *fatal*, *hang* and *abort* occur zero
    times; *kill* three times. Four analyses confirmed it. The central claim rests on the
@@ -417,13 +510,14 @@ needs technical vocabulary to notice hostility at all.
 5. **Single corpus, single domain.** Whether the failure mode generalises to other technical
    domains is untested here.
 6. **No contextual models.** A fine-tuned transformer might substantially reduce this bias;
-   we did not test it.
+   we did not test it. §6.1 argues why — we traded accuracy for exact explainability — but
+   it remains a limitation regardless of the justification.
 7. **Labels carry annotation noise**, Fleiss' κ = 0.759 — good, not perfect. Some
    "errors" are disagreements the raters also had.
 
 ---
 
-## 11. Conclusion and future work
+## 12. Conclusion
 
 A tuned TF-IDF + linear SVM reaches 0.8275 test macro-F1 on Senti4SD, ahead of VADER by
 0.12. Discriminative models beat the generative one decisively, and TF-IDF beats both
@@ -435,12 +529,6 @@ canonical claim cannot be tested on it — a fact that four independent analyses
 project surfaced and that we have not seen stated elsewhere. Tested on purpose-built
 sentences, the bias is unambiguous and its magnitude tracks how much general English the
 representation carries.
-
-**Future work.** (i) Evaluate a fine-tuned transformer — the obvious next question is
-whether contextual embeddings eliminate the bias or merely reduce it. (ii) Build a corpus
-that actually contains error-log vocabulary, drawn from bug trackers rather than discussion
-threads. (iii) Extend the stress set with blind cross-annotation. (iv) Replicate in a second
-technical domain to test whether the failure mode generalises.
 
 ---
 
@@ -477,5 +565,5 @@ python -m tools.run_final_evaluation            # section 7
 python -m src.evaluation.explain_lime           # section 8
 python -m src.evaluation.explain_shap           # section 8
 python -m src.evaluation.stress_test            # section 9
-python -m pytest -q                             # 123 tests
+python -m pytest -q                             # 90 tests
 ```

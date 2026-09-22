@@ -3,61 +3,72 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SE Sentiment Classifier</title>
+  <title >JargonSense</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="top">
-  <div class="top-inner">
-    <div class="brand">
-      <div class="brand-mark">SE</div>
-      <div class="brand-text">
-        <h1>SE Sentiment Classifier</h1>
-        <p>TF-IDF (1,3) + calibrated Linear SVM</p>
-      </div>
-    </div>
-  </div>
-</header>
+
+<button class="icon-btn theme-float" id="theme-toggle" type="button"
+        aria-label="Switch colour theme">
+  <span id="theme-icon">◐</span><span id="theme-label">Theme</span>
+</button>
 
 <main class="shell">
-  <section class="view active">
-    <div class="card">
-      <div class="card-head">
-        <h2>Classify developer communication</h2>
-        <span class="badge slow">LIME</span>
-      </div>
-      <textarea id="predict-text">Kill the process before restarting the server.</textarea>
-      <div class="row" style="margin-top:12px">
-        <button class="btn" id="predict-go">Classify</button>
-      </div>
-      <div class="chipset" id="examples" style="margin-top:12px"></div>
-    </div>
 
+  <!-- ==================================== title + input -->
+  <section class="masthead">
+    <h1 class="hero-title">JargonSense</h1>
+
+    <div class="search">
+      <textarea id="predict-text"
+                aria-label="Developer communication to classify"
+                >Kill the process before restarting the server.</textarea>
+      <div class="search-actions">
+        <button class="btn" id="predict-go" type="button">Classify</button>
+        <div class="search-meta">
+          <span class="hint mono" id="predict-status"></span>
+          <span class="hint mono kbd-hint">Ctrl + Enter</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== results -->
+  <section class="section" id="sec-result">
     <div class="card" id="predict-out" hidden>
       <div class="card-head">
-        <h2>Prediction</h2>
+        <h2>Result</h2>
         <span class="verdict" id="predict-verdict"></span>
       </div>
-      <div class="grid-2">
+      <div class="grid-2 wide-left">
         <div>
           <h3>Token contributions</h3>
           <div class="sentence" id="predict-sentence"></div>
+          <div class="legend" id="predict-legend"></div>
+          <p class="hint mono" id="predict-note" style="margin-top:10px"></p>
         </div>
         <div>
           <h3>Class probabilities</h3>
           <div class="bars" id="predict-bars"></div>
-          <p class="hint" id="predict-note" style="margin-top:14px"></p>
+          <p class="hint" id="predict-expect" style="margin-top:14px"></p>
         </div>
       </div>
     </div>
-
-    <div class="grid-3" id="metrics" style="margin-top:16px"></div>
-
-    <div class="card">
-      <div class="card-head"><h2>Stress-test performance</h2></div>
-      <div class="table-wrap"><table id="stress-table"><thead></thead><tbody></tbody></table></div>
-    </div>
   </section>
+
+  <!-- ========================================= examples -->
+  <section class="section" id="sec-examples">
+    <div class="section-head">
+      <h2>Examples</h2>
+      <p class="hint">
+        Click any card to load it into the classifier. The jargon examples are
+        all genuinely neutral — a general-purpose lexicon reads most of them
+        as hostile.
+      </p>
+    </div>
+    <div id="examples"></div>
+  </section>
+
 </main>
 <script src="app.js"></script>
 </body>

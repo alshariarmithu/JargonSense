@@ -5,97 +5,104 @@
 \citation{calefato2018sentiment}
 \citation{calefato2018sentiment}
 \citation{ahmed2017senticr}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Contributions}{2}{subsection.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{3}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Contributions}{3}{subsection.1.1}\protected@file@percent }
 \citation{ribeiro2016why}
 \citation{lundberg2017unified}
 \citation{pennington2014glove}
 \citation{mikolov2013distributed}
-\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{3}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}System Architecture}{3}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Pipeline Overview}{3}{subsection.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Six-stage pipeline: each stage produces artefacts consumed by the next.}}{3}{figure.caption.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{4}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}System Architecture}{4}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Pipeline Overview}{4}{subsection.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Six-stage pipeline: each stage produces artefacts consumed by the next.}}{4}{figure.caption.1}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:pipeline}{{1}{3}{Six-stage pipeline: each stage produces artefacts consumed by the next}{figure.caption.1}{}}
+\newlabel{fig:pipeline}{{1}{4}{Six-stage pipeline: each stage produces artefacts consumed by the next}{figure.caption.1}{}}
 \citation{calefato2018sentiment}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Module Architecture}{4}{subsection.3.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Module architecture of the \texttt  {src/} package, with each module mapped to its pipeline stage. The \texttt  {app/} module provides the Flask web interface.}}{4}{figure.caption.2}\protected@file@percent }
-\newlabel{fig:architecture}{{2}{4}{Module architecture of the \texttt {src/} package, with each module mapped to its pipeline stage. The \texttt {app/} module provides the Flask web interface}{figure.caption.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Data Acquisition}{4}{section.4}\protected@file@percent }
-\newlabel{sec:acquisition}{{4}{4}{Data Acquisition}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Corpus: Senti4SD Gold Standard}{4}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Corpus Statistics}{4}{subsection.4.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Corpus construction summary.}}{4}{table.caption.3}\protected@file@percent }
-\newlabel{tab:corpus}{{1}{4}{Corpus construction summary}{table.caption.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Class distribution in the Senti4SD corpus.}}{4}{table.caption.4}\protected@file@percent }
-\newlabel{tab:classdist}{{2}{4}{Class distribution in the Senti4SD corpus}{table.caption.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Text Extraction and Cleaning}{5}{section.5}\protected@file@percent }
-\newlabel{sec:extraction}{{5}{5}{Text Extraction and Cleaning}{section.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Critical Order Decisions}{5}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Preprocessing}{5}{section.6}\protected@file@percent }
-\newlabel{sec:preprocessing}{{6}{5}{Preprocessing}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Normalisation Modes}{5}{subsection.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Normalisation Ablation}{6}{subsection.6.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Normalisation ablation results on the validation split (650 documents).}}{6}{table.caption.5}\protected@file@percent }
-\newlabel{tab:ablation}{{3}{6}{Normalisation ablation results on the validation split (650 documents)}{table.caption.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Data Splitting}{6}{subsection.6.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Data split sizes.}}{6}{table.caption.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Feature Engineering}{6}{section.7}\protected@file@percent }
-\newlabel{sec:features}{{7}{6}{Feature Engineering}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}TF-IDF Representations}{6}{subsection.7.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces TF-IDF vocabulary statistics (fitted on training split only).}}{7}{table.caption.7}\protected@file@percent }
-\newlabel{tab:tfidf}{{5}{7}{TF-IDF vocabulary statistics (fitted on training split only)}{table.caption.7}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Top distinctive terms per sentiment class.}}{7}{table.caption.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}The Compound-Phrase Finding}{7}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Embeddings}{7}{subsection.7.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Embedding statistics.}}{7}{table.caption.9}\protected@file@percent }
-\newlabel{tab:embed}{{7}{7}{Embedding statistics}{table.caption.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Nearest neighbours reveal domain shift in GloVe embeddings.}}{7}{table.caption.10}\protected@file@percent }
-\newlabel{tab:neighbours}{{8}{7}{Nearest neighbours reveal domain shift in GloVe embeddings}{table.caption.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Model Building}{8}{section.8}\protected@file@percent }
-\newlabel{sec:modeling}{{8}{8}{Model Building}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}The Model Grid}{8}{subsection.8.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces The 15-model grid.}}{8}{table.caption.11}\protected@file@percent }
-\newlabel{tab:modelgrid}{{9}{8}{The 15-model grid}{table.caption.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Hyperparameter Tuning}{8}{subsection.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}Evaluation and Results}{8}{section.9}\protected@file@percent }
-\newlabel{sec:results}{{9}{8}{Evaluation and Results}{section.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Baselines}{8}{subsection.9.1}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Baseline performance on the test set.}}{8}{table.caption.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Test-Set Results}{9}{subsection.9.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Full test-set results, sorted by macro-F1.}}{9}{table.caption.13}\protected@file@percent }
-\newlabel{tab:results}{{11}{9}{Full test-set results, sorted by macro-F1}{table.caption.13}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Key Findings}{9}{subsection.9.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Best and mean macro-F1 by representation family.}}{9}{table.caption.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Error Analysis}{9}{subsection.9.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces Error categories for neutral$\rightarrow $negative misclassifications.}}{10}{table.caption.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {10}Explainability Analysis}{10}{section.10}\protected@file@percent }
-\newlabel{sec:explainability}{{10}{10}{Explainability Analysis}{section.10}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}LIME Explanations}{10}{subsection.10.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}SHAP Explanations}{10}{subsection.10.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}LIME--SHAP Agreement}{10}{subsection.10.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {10.4}Stability Analysis}{10}{subsection.10.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {11}Stress Test --- The Central Result}{11}{section.11}\protected@file@percent }
-\newlabel{sec:stress}{{11}{11}{Stress Test --- The Central Result}{section.11}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces Stress-test results across models (sorted by accuracy).}}{11}{table.caption.16}\protected@file@percent }
-\newlabel{tab:stress}{{14}{11}{Stress-test results across models (sorted by accuracy)}{table.caption.16}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.1}The Headline Result}{11}{subsection.11.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {11.2}Outcome \#3 --- Lexical Bias Tracks Pretraining}{11}{subsection.11.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {15}{\ignorespaces Mean false-alarm rate by representation --- bias tracks general English exposure.}}{11}{table.caption.17}\protected@file@percent }
-\newlabel{tab:bias}{{15}{11}{Mean false-alarm rate by representation --- bias tracks general English exposure}{table.caption.17}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {12}Web Application}{12}{section.12}\protected@file@percent }
-\newlabel{sec:webapp}{{12}{12}{Web Application}{section.12}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {13}Limitations}{12}{section.13}\protected@file@percent }
-\newlabel{sec:limitations}{{13}{12}{Limitations}{section.13}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {14}Conclusion and Future Work}{12}{section.14}\protected@file@percent }
-\newlabel{sec:conclusion}{{14}{12}{Conclusion and Future Work}{section.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Module Architecture}{5}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Module architecture of the \texttt  {src/} package, with each module mapped to its pipeline stage. The \texttt  {app/} module provides the Flask web interface.}}{5}{figure.caption.2}\protected@file@percent }
+\newlabel{fig:architecture}{{2}{5}{Module architecture of the \texttt {src/} package, with each module mapped to its pipeline stage. The \texttt {app/} module provides the Flask web interface}{figure.caption.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Data Acquisition}{5}{section.4}\protected@file@percent }
+\newlabel{sec:acquisition}{{4}{5}{Data Acquisition}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Corpus: Senti4SD Gold Standard}{5}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Corpus Statistics}{5}{subsection.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Corpus construction summary.}}{5}{table.caption.3}\protected@file@percent }
+\newlabel{tab:corpus}{{1}{5}{Corpus construction summary}{table.caption.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Class distribution in the Senti4SD corpus.}}{5}{table.caption.4}\protected@file@percent }
+\newlabel{tab:classdist}{{2}{5}{Class distribution in the Senti4SD corpus}{table.caption.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Text Extraction and Cleaning}{6}{section.5}\protected@file@percent }
+\newlabel{sec:extraction}{{5}{6}{Text Extraction and Cleaning}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Critical Order Decisions}{6}{subsection.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Preprocessing}{6}{section.6}\protected@file@percent }
+\newlabel{sec:preprocessing}{{6}{6}{Preprocessing}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Normalisation Modes}{6}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Normalisation Ablation}{7}{subsection.6.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Normalisation ablation results on the validation split (650 documents).}}{7}{table.caption.5}\protected@file@percent }
+\newlabel{tab:ablation}{{3}{7}{Normalisation ablation results on the validation split (650 documents)}{table.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Data Splitting}{7}{subsection.6.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Data split sizes.}}{7}{table.caption.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Feature Engineering}{7}{section.7}\protected@file@percent }
+\newlabel{sec:features}{{7}{7}{Feature Engineering}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}TF-IDF Representations}{7}{subsection.7.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces TF-IDF vocabulary statistics (fitted on training split only).}}{8}{table.caption.7}\protected@file@percent }
+\newlabel{tab:tfidf}{{5}{8}{TF-IDF vocabulary statistics (fitted on training split only)}{table.caption.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Top distinctive terms per sentiment class.}}{8}{table.caption.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}The Compound-Phrase Finding}{8}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Embeddings}{8}{subsection.7.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Embedding statistics.}}{8}{table.caption.9}\protected@file@percent }
+\newlabel{tab:embed}{{7}{8}{Embedding statistics}{table.caption.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Nearest neighbours reveal domain shift in GloVe embeddings.}}{8}{table.caption.10}\protected@file@percent }
+\newlabel{tab:neighbours}{{8}{8}{Nearest neighbours reveal domain shift in GloVe embeddings}{table.caption.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Model Building}{9}{section.8}\protected@file@percent }
+\newlabel{sec:modeling}{{8}{9}{Model Building}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}The Model Grid}{9}{subsection.8.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces The 15-model grid.}}{9}{table.caption.11}\protected@file@percent }
+\newlabel{tab:modelgrid}{{9}{9}{The 15-model grid}{table.caption.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Hyperparameter Tuning}{9}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Why a Linear Model and Not a Transformer}{9}{subsection.8.3}\protected@file@percent }
+\newlabel{sec:whynotbert}{{8.3}{9}{Why a Linear Model and Not a Transformer}{subsection.8.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Why explaining BERT is harder than explaining a linear SVM.}}{10}{table.caption.12}\protected@file@percent }
+\newlabel{tab:bertcompare}{{10}{10}{Why explaining BERT is harder than explaining a linear SVM}{table.caption.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Evaluation and Results}{11}{section.9}\protected@file@percent }
+\newlabel{sec:results}{{9}{11}{Evaluation and Results}{section.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.1}Baselines}{11}{subsection.9.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {11}{\ignorespaces Baseline performance on the test set.}}{11}{table.caption.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2}Test-Set Results}{11}{subsection.9.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {12}{\ignorespaces Full test-set results, sorted by macro-F1.}}{11}{table.caption.14}\protected@file@percent }
+\newlabel{tab:results}{{12}{11}{Full test-set results, sorted by macro-F1}{table.caption.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3}Key Findings}{11}{subsection.9.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {13}{\ignorespaces Best and mean macro-F1 by representation family.}}{11}{table.caption.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4}Error Analysis}{12}{subsection.9.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {14}{\ignorespaces Error categories for neutral$\rightarrow $negative misclassifications.}}{12}{table.caption.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}Explainability Analysis}{12}{section.10}\protected@file@percent }
+\newlabel{sec:explainability}{{10}{12}{Explainability Analysis}{section.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.1}LIME Explanations}{12}{subsection.10.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.2}SHAP Explanations}{12}{subsection.10.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.3}LIME--SHAP Agreement}{13}{subsection.10.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {10.4}Stability Analysis}{13}{subsection.10.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {11}Stress Test --- The Central Result}{13}{section.11}\protected@file@percent }
+\newlabel{sec:stress}{{11}{13}{Stress Test --- The Central Result}{section.11}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {15}{\ignorespaces Stress-test results across models (sorted by accuracy).}}{13}{table.caption.17}\protected@file@percent }
+\newlabel{tab:stress}{{15}{13}{Stress-test results across models (sorted by accuracy)}{table.caption.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.1}The Headline Result}{13}{subsection.11.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {11.2}Outcome \#3 --- Lexical Bias Tracks Pretraining}{14}{subsection.11.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {16}{\ignorespaces Mean false-alarm rate by representation --- bias tracks general English exposure.}}{14}{table.caption.18}\protected@file@percent }
+\newlabel{tab:bias}{{16}{14}{Mean false-alarm rate by representation --- bias tracks general English exposure}{table.caption.18}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {12}Web Application}{14}{section.12}\protected@file@percent }
+\newlabel{sec:webapp}{{12}{14}{Web Application}{section.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {12.1}Held-Out Probe Sentences}{14}{subsection.12.1}\protected@file@percent }
+\newlabel{sec:probes}{{12.1}{14}{Held-Out Probe Sentences}{subsection.12.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {17}{\ignorespaces Retained \texttt  {tfidf13\_svm} pipeline on the eight held-out probe sentences. Probabilities are negative / neutral / positive.}}{15}{table.caption.19}\protected@file@percent }
+\newlabel{tab:probes}{{17}{15}{Retained \texttt {tfidf13\_svm} pipeline on the eight held-out probe sentences. Probabilities are negative / neutral / positive}{table.caption.19}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {13}Limitations}{15}{section.13}\protected@file@percent }
+\newlabel{sec:limitations}{{13}{15}{Limitations}{section.13}{}}
 \bibcite{calefato2018sentiment}{{1}{}{{}}{{}}}
 \bibcite{ribeiro2016why}{{2}{}{{}}{{}}}
 \bibcite{lundberg2017unified}{{3}{}{{}}{{}}}
 \bibcite{pennington2014glove}{{4}{}{{}}{{}}}
 \bibcite{mikolov2013distributed}{{5}{}{{}}{{}}}
 \bibcite{ahmed2017senticr}{{6}{}{{}}{{}}}
+\@writefile{toc}{\contentsline {section}{\numberline {14}Conclusion}{16}{section.14}\protected@file@percent }
+\newlabel{sec:conclusion}{{14}{16}{Conclusion}{section.14}{}}
 \bibcite{hutto2014vader}{{7}{}{{}}{{}}}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\@writefile{toc}{\contentsline {subsection}{\numberline {14.1}Future Work}{13}{subsection.14.1}\protected@file@percent }
-\gdef \@abspage@last{15}
+\gdef \@abspage@last{18}

@@ -161,23 +161,50 @@ def api_stress():
     })
 
 
+# Each label must be distinct: the interface renders one card per example, and
+# four cards reading "SE jargon" are four identical buttons to the reader.
 EXAMPLES = [
-    {"kind": "SE jargon, neutral",
+    {"label": "kill", "kind": "SE jargon", "expected": "neutral",
      "text": "Kill the process before restarting the server."},
-    {"kind": "SE jargon, neutral",
+    {"label": "fatal error", "kind": "SE jargon", "expected": "neutral",
      "text": "The build failed with a fatal error on line 42."},
-    {"kind": "SE jargon, neutral",
+    {"label": "destroys", "kind": "SE jargon", "expected": "neutral",
      "text": "Garbage collection destroys unused objects automatically."},
-    {"kind": "SE jargon, neutral",
+    {"label": "deadlock", "kind": "SE jargon", "expected": "neutral",
      "text": "A deadlock occurs when two threads wait on each other."},
-    {"kind": "Genuine complaint",
+    {"label": "real complaint", "kind": "Genuine sentiment", "expected": "negative",
      "text": "The documentation is worthless and the maintainers ignore every issue."},
-    {"kind": "Genuine complaint",
+    {"label": "regret", "kind": "Genuine sentiment", "expected": "negative",
      "text": "I regret choosing this library, it has been nothing but trouble."},
-    {"kind": "Genuine praise",
+    {"label": "thanks", "kind": "Genuine sentiment", "expected": "positive",
      "text": "Thanks, this works perfectly and saved me hours of debugging."},
-    {"kind": "Neutral question",
+    {"label": "plain question", "kind": "Ordinary prose", "expected": "neutral",
      "text": "How do I use this function with a custom comparator?"},
+
+    # Held-out probes.  Every jargon word below occurs ZERO times in the 3,031
+    # training documents -- zombie, reap, poison, watchdog, starvation, orphan,
+    # panic, abort, deadlock, scheduler.  Nothing here comes from Senti4SD or
+    # from the stress set either, so these are the only examples in the app the
+    # pipeline has no exposure to whatsoever.  They are the honest demo: the
+    # first four show the model staying neutral on vocabulary it never learned,
+    # and the last four show where it still fails.
+    {"label": "zombie", "kind": "Held-out jargon", "expected": "neutral",
+     "text": "The parent process must reap its zombie children or the table fills up."},
+    {"label": "poison pill", "kind": "Held-out jargon", "expected": "neutral",
+     "text": "A poison pill message forces the consumer thread to terminate cleanly."},
+    {"label": "watchdog", "kind": "Held-out jargon", "expected": "neutral",
+     "text": "The watchdog timer aborts any request that hangs for over thirty seconds."},
+    {"label": "kernel panic", "kind": "Held-out jargon", "expected": "neutral",
+     "text": "The kernel panic dumped a core file to the crash directory."},
+
+    {"label": "abort · calm", "kind": "Held-out sentiment", "expected": "neutral",
+     "text": "The service aborted the transaction and rolled back cleanly."},
+    {"label": "abort · angry", "kind": "Held-out sentiment", "expected": "negative",
+     "text": "The service aborted my transaction again and lost two hours of work."},
+    {"label": "corruption", "kind": "Held-out sentiment", "expected": "negative",
+     "text": "Another silent data corruption bug, and the team still refuses to write tests."},
+    {"label": "praise", "kind": "Held-out sentiment", "expected": "positive",
+     "text": "This patch fixed the deadlock immediately, brilliant work on the lock ordering."},
 ]
 
 

@@ -1,4 +1,4 @@
-"""Build the SE corpus from the Senti4SD gold standard (Task A1).
+"""Build the SE corpus from the Senti4SD gold standard.
 
 Reads the gold-standard workbook, standardises it to the project's
 ``id;text;polarity`` contract, and reports the numbers the report needs:
